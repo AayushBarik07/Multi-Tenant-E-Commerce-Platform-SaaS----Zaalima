@@ -31,7 +31,7 @@ app.get('/api/protected', requireAuth(), (req, res) => {
 
 // Setup basic routes mapping (to be expanded)
 app.use('/api/auth', require('./routes/auth'));
-// app.use('/api/stores', require('./routes/stores'));
+app.use('/api/stores', require('./routes/stores'));
 // app.use('/api/products', require('./routes/products'));
 
 // Error handling middleware

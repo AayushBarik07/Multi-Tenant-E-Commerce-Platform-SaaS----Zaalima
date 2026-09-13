@@ -58,3 +58,6 @@ A user's role is stored in the database. When a user authenticates, their Clerk 
 - **Day 5:** Role-based access middleware (`requireRole`) & protected base APIs.
 - **Day 6:** React frontend setup with Vite, Tailwind CSS v4, Redux Toolkit, and React Router.
 - **Day 7:** Login/Register UI flows, Role-based dashboards scaffold, and Redux User State synchronization.
+
+### Week 2 - Inventory & Store Management
+- **Day 8:** Store API endpoints (Create & Read operations) with Vendor role protection.
