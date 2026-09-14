@@ -40,7 +40,8 @@ const getStoreById = async (req, res) => {
 // @route   POST /api/stores
 const createStore = async (req, res) => {
   const { name, description, logo_url } = req.body;
-  const { userId } = req.auth; // clerk_user_id
+  const { getAuth } = require('@clerk/express');
+  const { userId } = getAuth(req); // clerk_user_id
 
   if (!name) {
     return res.status(400).json({ error: 'Store name is required' });
@@ -75,8 +76,89 @@ const createStore = async (req, res) => {
   }
 };
 
+// @desc    Update a store (Vendor only, must own the store)
+// @route   PATCH /api/stores/:id
+const updateStore = async (req, res) => {
+  const { id } = req.params;
+  const { name, description, logo_url, status } = req.body;
+  const { getAuth } = require('@clerk/express');
+  const { userId } = getAuth(req);
+
+  try {
+    // 1. Verify ownership
+    const userResult = await db.query('SELECT id FROM users WHERE clerk_user_id = $1', [userId]);
+    if (userResult.rows.length === 0) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const ownerUserId = userResult.rows[0].id;
+
+    const storeResult = await db.query('SELECT * FROM stores WHERE id = $1', [id]);
+    if (storeResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+
+    if (storeResult.rows[0].owner_user_id !== ownerUserId) {
+      return res.status(403).json({ error: 'Forbidden: You do not own this store' });
+    }
+
+    // 2. Update store
+    const currentStore = storeResult.rows[0];
+    const updatedName = name || currentStore.name;
+    const updatedDescription = description !== undefined ? description : currentStore.description;
+    const updatedLogoUrl = logo_url !== undefined ? logo_url : currentStore.logo_url;
+    const updatedStatus = status || currentStore.status;
+    
+    // We optionally update the slug if the name changes, but usually slugs should be immutable
+    // For simplicity, we'll keep the old slug.
+    
+    const updateResult = await db.query(
+      'UPDATE stores SET name = $1, description = $2, logo_url = $3, status = $4 WHERE id = $5 RETURNING *',
+      [updatedName, updatedDescription, updatedLogoUrl, updatedStatus, id]
+    );
+
+    res.json({ success: true, store: updateResult.rows[0] });
+  } catch (error) {
+    console.error('Error updating store:', error);
+    res.status(500).json({ error: 'Server error updating store' });
+  }
+};
+
+// @desc    Delete a store (Vendor only, must own the store)
+// @route   DELETE /api/stores/:id
+const deleteStore = async (req, res) => {
+  const { id } = req.params;
+  const { getAuth } = require('@clerk/express');
+  const { userId } = getAuth(req);
+
+  try {
+    const userResult = await db.query('SELECT id FROM users WHERE clerk_user_id = $1', [userId]);
+    if (userResult.rows.length === 0) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const ownerUserId = userResult.rows[0].id;
+
+    const storeResult = await db.query('SELECT owner_user_id FROM stores WHERE id = $1', [id]);
+    if (storeResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+
+    if (storeResult.rows[0].owner_user_id !== ownerUserId) {
+      return res.status(403).json({ error: 'Forbidden: You do not own this store' });
+    }
+
+    await db.query('DELETE FROM stores WHERE id = $1', [id]);
+
+    res.json({ success: true, message: 'Store deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting store:', error);
+    res.status(500).json({ error: 'Server error deleting store' });
+  }
+};
+
 module.exports = {
   getStores,
   getStoreById,
-  createStore
+  createStore,
+  updateStore,
+  deleteStore
 };

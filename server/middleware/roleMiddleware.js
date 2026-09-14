@@ -1,9 +1,10 @@
 const db = require('../utils/db');
+const { getAuth } = require('@clerk/express');
 
 const requireRole = (allowedRoles) => {
   return async (req, res, next) => {
     try {
-      const { userId } = req.auth;
+      const { userId } = getAuth(req);
       if (!userId) {
         return res.status(401).json({ error: 'Unauthorized' });
       }

@@ -22,7 +22,8 @@ app.get('/api/health', (req, res) => {
 // Protected Route Example
 app.get('/api/protected', requireAuth(), (req, res) => {
   // Access the user ID from the Clerk auth object
-  const { userId } = req.auth;
+  const { getAuth } = require('@clerk/express');
+  const { userId } = getAuth(req);
   res.json({ 
     message: 'This is a protected route',
     userId 
@@ -32,6 +33,7 @@ app.get('/api/protected', requireAuth(), (req, res) => {
 // Setup basic routes mapping (to be expanded)
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/stores', require('./routes/stores'));
+app.use('/api/upload', require('./routes/upload'));
 // app.use('/api/products', require('./routes/products'));
 
 // Error handling middleware

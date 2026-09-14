@@ -12,11 +12,14 @@
   "type": "commonjs",
   "dependencies": {
     "@clerk/express": "^2.1.67",
+    "cloudinary": "^2.11.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mongoose": "^9.10.0",
+    "multer": "^2.4.0",
     "pg": "^8.23.0",
+    "streamifier": "^0.1.1",
     "supabase-js": "^0.0.1-security"
   },
   "devDependencies": {

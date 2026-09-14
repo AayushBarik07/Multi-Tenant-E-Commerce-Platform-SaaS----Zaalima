@@ -1,13 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const { requireAuth } = require('@clerk/express');
+const { getAuth } = require('@clerk/express');
 const db = require('../utils/db');
 
 // Sync user from Clerk to our database
-router.post('/sync', requireAuth(), async (req, res) => {
-  const { userId } = req.auth;
-  // Clerk payload is usually passed from frontend during sync, 
-  // or we can just create the user with default values if they don't exist.
+router.post('/sync', async (req, res) => {
+  // Use getAuth to properly extract the userId
+  const { userId } = getAuth(req);
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  
+  // Clerk payload is usually passed from frontend during sync,
   const { name, email } = req.body; 
 
   try {
