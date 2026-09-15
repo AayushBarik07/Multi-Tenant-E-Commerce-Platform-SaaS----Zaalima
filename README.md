@@ -63,3 +63,4 @@ A user's role is stored in the database. When a user authenticates, their Clerk 
 - **Day 8:** Store API endpoints (Create & Read operations) with Vendor role protection.
 - **Day 9:** Store API endpoints (Update, Delete) and robust Cloudinary image upload setup via `/api/upload`.
 - **Day 10:** Product API endpoints (CRUD) with Store ownership verification.
+- **Day 11:** Vendor Dashboard Layout (Sidebar/Navbar) & functional Store Settings React UI to create/update stores and upload logos.
