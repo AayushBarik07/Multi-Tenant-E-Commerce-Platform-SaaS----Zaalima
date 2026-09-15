@@ -34,7 +34,7 @@ app.get('/api/protected', requireAuth(), (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/stores', require('./routes/stores'));
 app.use('/api/upload', require('./routes/upload'));
-// app.use('/api/products', require('./routes/products'));
+app.use('/api/products', require('./routes/products'));
 
 // Error handling middleware
 app.use((err, req, res, next) => {

@@ -62,3 +62,4 @@ A user's role is stored in the database. When a user authenticates, their Clerk 
 ### Week 2 - Inventory & Store Management
 - **Day 8:** Store API endpoints (Create & Read operations) with Vendor role protection.
 - **Day 9:** Store API endpoints (Update, Delete) and robust Cloudinary image upload setup via `/api/upload`.
+- **Day 10:** Product API endpoints (CRUD) with Store ownership verification.

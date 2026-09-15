@@ -3,6 +3,9 @@ import { SignedIn, SignedOut, SignIn, SignUp, UserButton, useAuth, useUser } fro
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser } from './redux/slices/authSlice';
+import VendorLayout from './components/vendor/VendorLayout';
+import VendorDashboard from './pages/vendor/VendorDashboard';
+import StoreSettings from './pages/vendor/StoreSettings';
 
 function SyncUser({ children }) {
   const { isLoaded, userId, getToken } = useAuth();
@@ -53,7 +56,7 @@ function RoleDashboard() {
     case 'SUPER_ADMIN':
       return <div><h2 className="text-2xl font-bold">Admin Dashboard</h2><p>Welcome Admin!</p></div>;
     case 'VENDOR':
-      return <div><h2 className="text-2xl font-bold">Vendor Dashboard</h2><p>Welcome to your Store Dashboard!</p></div>;
+      return <Navigate to="/vendor" />;
     case 'CUSTOMER':
     default:
       return <div><h2 className="text-2xl font-bold">Customer Dashboard</h2><p>Welcome back!</p></div>;
@@ -101,6 +104,16 @@ function App() {
                   </SignedOut>
                 </>
               } />
+              
+              {/* Vendor Routes */}
+              <Route path="/vendor" element={
+                <SignedIn>
+                  <VendorLayout />
+                </SignedIn>
+              }>
+                <Route index element={<VendorDashboard />} />
+                <Route path="store" element={<StoreSettings />} />
+              </Route>
             </Routes>
           </main>
         </div>

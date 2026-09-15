@@ -76,6 +76,32 @@ const createStore = async (req, res) => {
   }
 };
 
+// @desc    Get current vendor's store
+// @route   GET /api/stores/my-store
+const getMyStore = async (req, res) => {
+  const { getAuth } = require('@clerk/express');
+  const { userId } = getAuth(req);
+
+  try {
+    const userResult = await db.query('SELECT id FROM users WHERE clerk_user_id = $1', [userId]);
+    if (userResult.rows.length === 0) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const ownerUserId = userResult.rows[0].id;
+
+    const result = await db.query('SELECT * FROM stores WHERE owner_user_id = $1', [ownerUserId]);
+    
+    if (result.rows.length === 0) {
+      return res.json({ success: true, store: null });
+    }
+
+    res.json({ success: true, store: result.rows[0] });
+  } catch (error) {
+    console.error('Error fetching vendor store:', error);
+    res.status(500).json({ error: 'Server error fetching store' });
+  }
+};
+
 // @desc    Update a store (Vendor only, must own the store)
 // @route   PATCH /api/stores/:id
 const updateStore = async (req, res) => {
@@ -158,6 +184,7 @@ const deleteStore = async (req, res) => {
 module.exports = {
   getStores,
   getStoreById,
+  getMyStore,
   createStore,
   updateStore,
   deleteStore
