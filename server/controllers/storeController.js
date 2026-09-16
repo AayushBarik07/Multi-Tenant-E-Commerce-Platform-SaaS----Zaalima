@@ -102,6 +102,45 @@ const getMyStore = async (req, res) => {
   }
 };
 
+// @desc    Get current vendor's dashboard stats
+// @route   GET /api/stores/my/stats
+const getVendorStats = async (req, res) => {
+  const { getAuth } = require('@clerk/express');
+  const { userId } = getAuth(req);
+
+  try {
+    const userResult = await db.query('SELECT id FROM users WHERE clerk_user_id = $1', [userId]);
+    if (userResult.rows.length === 0) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const ownerUserId = userResult.rows[0].id;
+
+    const storeResult = await db.query('SELECT id FROM stores WHERE owner_user_id = $1', [ownerUserId]);
+    
+    if (storeResult.rows.length === 0) {
+      return res.json({ success: true, stats: { products: 0, orders: 0, revenue: 0 } });
+    }
+    const storeId = storeResult.rows[0].id;
+
+    // Get product count
+    const productsResult = await db.query('SELECT COUNT(*) FROM products WHERE store_id = $1', [storeId]);
+    const activeProducts = parseInt(productsResult.rows[0].count, 10);
+
+    // Orders & Revenue will be added in Week 3, returning 0 for now
+    res.json({ 
+      success: true, 
+      stats: { 
+        products: activeProducts, 
+        orders: 0, 
+        revenue: 0 
+      } 
+    });
+  } catch (error) {
+    console.error('Error fetching vendor stats:', error);
+    res.status(500).json({ error: 'Server error fetching stats' });
+  }
+};
+
 // @desc    Update a store (Vendor only, must own the store)
 // @route   PATCH /api/stores/:id
 const updateStore = async (req, res) => {
@@ -185,6 +224,7 @@ module.exports = {
   getStores,
   getStoreById,
   getMyStore,
+  getVendorStats,
   createStore,
   updateStore,
   deleteStore

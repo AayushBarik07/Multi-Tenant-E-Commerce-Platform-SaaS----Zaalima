@@ -64,3 +64,6 @@ A user's role is stored in the database. When a user authenticates, their Clerk 
 - **Day 9:** Store API endpoints (Update, Delete) and robust Cloudinary image upload setup via `/api/upload`.
 - **Day 10:** Product API endpoints (CRUD) with Store ownership verification.
 - **Day 11:** Vendor Dashboard Layout (Sidebar/Navbar) & functional Store Settings React UI to create/update stores and upload logos.
+- **Day 12:** Product Management UI (Add/Edit products, Upload images) to connect the React frontend to the backend Product CRUD APIs.
+- **Day 13:** Inventory, Pricing, and Variants Logic Implementation (adding support for Sizes, Colors, and dynamic stock/pricing in backend and frontend UI).
+- **Day 14:** Store & Product Frontend/Backend Integration Testing & Polish (built Vendor Dashboard dynamic statistics API to track total products and revenue).

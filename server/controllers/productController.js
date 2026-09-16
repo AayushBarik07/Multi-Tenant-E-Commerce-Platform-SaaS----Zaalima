@@ -47,7 +47,13 @@ const getProductById = async (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    res.json({ success: true, product: result.rows[0] });
+    const product = result.rows[0];
+    
+    // Fetch variants
+    const variantsResult = await db.query('SELECT * FROM product_variants WHERE product_id = $1 ORDER BY name, value', [id]);
+    product.variants = variantsResult.rows;
+
+    res.json({ success: true, product });
   } catch (error) {
     console.error('Error fetching product:', error);
     res.status(500).json({ error: 'Server error fetching product' });
@@ -153,10 +159,76 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+// @desc    Add a variant to a product
+// @route   POST /api/products/:id/variants
+const addVariant = async (req, res) => {
+  const { id } = req.params; // Product ID
+  const { name, value, price_adjustment, stock } = req.body;
+  const { userId } = getAuth(req);
+
+  if (!name || !value) {
+    return res.status(400).json({ error: 'Variant name and value are required' });
+  }
+
+  try {
+    const productResult = await db.query('SELECT store_id FROM products WHERE id = $1', [id]);
+    if (productResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Product not found' });
+    }
+    
+    const storeId = productResult.rows[0].store_id;
+    const isOwner = await checkStoreOwnership(userId, storeId);
+    if (!isOwner) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    const result = await db.query(
+      'INSERT INTO product_variants (product_id, name, value, price_adjustment, stock) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [id, name, value, price_adjustment || 0, stock || 0]
+    );
+
+    res.status(201).json({ success: true, variant: result.rows[0] });
+  } catch (error) {
+    console.error('Error adding variant:', error);
+    res.status(500).json({ error: 'Server error adding variant' });
+  }
+};
+
+// @desc    Delete a variant
+// @route   DELETE /api/products/variants/:variantId
+const deleteVariant = async (req, res) => {
+  const { variantId } = req.params;
+  const { userId } = getAuth(req);
+
+  try {
+    const variantResult = await db.query('SELECT product_id FROM product_variants WHERE id = $1', [variantId]);
+    if (variantResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Variant not found' });
+    }
+
+    const productId = variantResult.rows[0].product_id;
+    const productResult = await db.query('SELECT store_id FROM products WHERE id = $1', [productId]);
+    
+    const storeId = productResult.rows[0].store_id;
+    const isOwner = await checkStoreOwnership(userId, storeId);
+    if (!isOwner) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
+
+    await db.query('DELETE FROM product_variants WHERE id = $1', [variantId]);
+    res.json({ success: true, message: 'Variant deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting variant:', error);
+    res.status(500).json({ error: 'Server error deleting variant' });
+  }
+};
+
 module.exports = {
   getProducts,
   getProductById,
   createProduct,
   updateProduct,
-  deleteProduct
+  deleteProduct,
+  addVariant,
+  deleteVariant
 };

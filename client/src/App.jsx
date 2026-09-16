@@ -6,6 +6,8 @@ import { setUser, clearUser } from './redux/slices/authSlice';
 import VendorLayout from './components/vendor/VendorLayout';
 import VendorDashboard from './pages/vendor/VendorDashboard';
 import StoreSettings from './pages/vendor/StoreSettings';
+import ProductsList from './pages/vendor/ProductsList';
+import ProductForm from './pages/vendor/ProductForm';
 
 function SyncUser({ children }) {
   const { isLoaded, userId, getToken } = useAuth();
@@ -113,6 +115,8 @@ function App() {
               }>
                 <Route index element={<VendorDashboard />} />
                 <Route path="store" element={<StoreSettings />} />
+                <Route path="products" element={<ProductsList />} />
+                <Route path="products/:id" element={<ProductForm />} />
               </Route>
             </Routes>
           </main>
