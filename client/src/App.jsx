@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
 import { SignedIn, SignedOut, SignIn, SignUp, UserButton, useAuth, useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -8,6 +8,11 @@ import VendorDashboard from './pages/vendor/VendorDashboard';
 import StoreSettings from './pages/vendor/StoreSettings';
 import ProductsList from './pages/vendor/ProductsList';
 import ProductForm from './pages/vendor/ProductForm';
+import Home from './pages/public/Home';
+import Storefront from './pages/public/Storefront';
+import ProductDetails from './pages/public/ProductDetails';
+import CartDrawer from './components/public/CartDrawer';
+import { toggleCart } from './redux/slices/cartSlice';
 
 function SyncUser({ children }) {
   const { isLoaded, userId, getToken } = useAuth();
@@ -66,34 +71,51 @@ function RoleDashboard() {
 }
 
 function App() {
+  const dispatch = useDispatch();
+  const cartItemsCount = useSelector(state => state.cart.items.reduce((acc, item) => acc + item.quantity, 0));
+
   return (
     <Router>
       <SyncUser>
         <div className="min-h-screen bg-gray-50 flex flex-col">
           {/* Basic Header */}
-          <header className="bg-white shadow-sm p-4 flex justify-between items-center">
-            <h1 className="text-xl font-bold text-indigo-600">Zaalima</h1>
-            <nav>
+          <header className="bg-white shadow-sm p-4 flex justify-between items-center relative z-10">
+            <Link to="/" className="text-xl font-bold text-indigo-600 hover:text-indigo-700">Zaalima</Link>
+            <nav className="flex items-center">
+              <button 
+                onClick={() => dispatch(toggleCart())}
+                className="mr-6 relative text-gray-600 hover:text-indigo-600 flex items-center"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {cartItemsCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
+                    {cartItemsCount}
+                  </span>
+                )}
+              </button>
+              
               <SignedIn>
-                <a href="/dashboard" className="mr-4 font-medium text-gray-700 hover:text-indigo-600">Dashboard</a>
+                <Link to="/dashboard" className="mr-4 font-medium text-gray-700 hover:text-indigo-600">Dashboard</Link>
                 <UserButton />
               </SignedIn>
               <SignedOut>
-                <a href="/sign-in" className="text-indigo-600 font-medium hover:underline mr-4">Sign In</a>
-                <a href="/sign-up" className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Sign Up</a>
+                <Link to="/sign-in" className="text-indigo-600 font-medium hover:underline mr-4">Sign In</Link>
+                <Link to="/sign-up" className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Sign Up</Link>
               </SignedOut>
             </nav>
           </header>
 
+          <CartDrawer />
+
           {/* Main Content */}
-          <main className="flex-grow p-4 flex justify-center items-center">
+          <main className="flex-grow p-4 flex justify-center items-start">
             <Routes>
-              <Route path="/" element={
-                <div className="text-center">
-                  <h2 className="text-3xl font-bold mb-4">Welcome to Zaalima</h2>
-                  <p className="text-gray-600">The premier multi-tenant e-commerce platform.</p>
-                </div>
-              } />
+              <Route path="/" element={<Home />} />
+              <Route path="/store/:storeId" element={<Storefront />} />
+              <Route path="/product/:id" element={<ProductDetails />} />
+              
               <Route path="/sign-in/*" element={<SignIn routing="path" path="/sign-in" />} />
               <Route path="/sign-up/*" element={<SignUp routing="path" path="/sign-up" />} />
               <Route path="/dashboard" element={

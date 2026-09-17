@@ -35,6 +35,18 @@ const VendorLayout = () => {
               </Link>
             );
           })}
+          
+          <div className="pt-8 mt-4 border-t border-gray-200">
+            <Link 
+              to="/" 
+              className="block px-4 py-2 text-indigo-600 hover:bg-indigo-50 rounded-md font-medium flex items-center"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Go to Public Store
+            </Link>
+          </div>
         </nav>
       </div>
 

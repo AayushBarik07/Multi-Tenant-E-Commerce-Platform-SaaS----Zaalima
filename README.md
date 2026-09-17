@@ -67,3 +67,7 @@ A user's role is stored in the database. When a user authenticates, their Clerk 
 - **Day 12:** Product Management UI (Add/Edit products, Upload images) to connect the React frontend to the backend Product CRUD APIs.
 - **Day 13:** Inventory, Pricing, and Variants Logic Implementation (adding support for Sizes, Colors, and dynamic stock/pricing in backend and frontend UI).
 - **Day 14:** Store & Product Frontend/Backend Integration Testing & Polish (built Vendor Dashboard dynamic statistics API to track total products and revenue).
+
+### Week 3 - Cart, Checkout & Payments
+- **Day 15:** Public Storefront UI (Home page listing active stores, Storefront grid, and Product Details page with dynamic variant selection).
+- **Day 16:** Shopping Cart implementation (Redux Global State, slide-over Cart panel, and live Subtotal calculations).
