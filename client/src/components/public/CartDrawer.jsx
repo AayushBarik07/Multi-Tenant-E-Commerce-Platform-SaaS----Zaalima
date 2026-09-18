@@ -1,8 +1,10 @@
 import { useSelector, useDispatch } from 'react-redux';
 import { closeCart, removeFromCart, updateQuantity } from '../../redux/slices/cartSlice';
+import { useNavigate } from 'react-router-dom';
 
 const CartDrawer = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { items, isOpen } = useSelector((state) => state.cart);
 
   if (!isOpen) return null;
@@ -120,7 +122,10 @@ const CartDrawer = () => {
                 <div className="mt-6">
                   <button
                     className="w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-                    onClick={() => alert('Checkout flow coming in Day 18!')}
+                    onClick={() => {
+                      dispatch(closeCart());
+                      navigate('/checkout');
+                    }}
                   >
                     Checkout
                   </button>

@@ -11,6 +11,7 @@ import ProductForm from './pages/vendor/ProductForm';
 import Home from './pages/public/Home';
 import Storefront from './pages/public/Storefront';
 import ProductDetails from './pages/public/ProductDetails';
+import Checkout from './pages/public/Checkout';
 import CartDrawer from './components/public/CartDrawer';
 import { toggleCart } from './redux/slices/cartSlice';
 
@@ -115,6 +116,11 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/store/:storeId" element={<Storefront />} />
               <Route path="/product/:id" element={<ProductDetails />} />
+              <Route path="/checkout" element={
+                <SignedIn>
+                  <Checkout />
+                </SignedIn>
+              } />
               
               <Route path="/sign-in/*" element={<SignIn routing="path" path="/sign-in" />} />
               <Route path="/sign-up/*" element={<SignUp routing="path" path="/sign-up" />} />

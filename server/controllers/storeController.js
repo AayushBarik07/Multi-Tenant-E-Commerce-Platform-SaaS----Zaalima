@@ -126,18 +126,59 @@ const getVendorStats = async (req, res) => {
     const productsResult = await db.query('SELECT COUNT(*) FROM products WHERE store_id = $1', [storeId]);
     const activeProducts = parseInt(productsResult.rows[0].count, 10);
 
-    // Orders & Revenue will be added in Week 3, returning 0 for now
+    // Get orders count and total revenue
+    // Only counting orders that have a payment_status of SUCCESS
+    const ordersResult = await db.query(
+      "SELECT COUNT(*) as total_orders, COALESCE(SUM(total_amount), 0) as total_revenue FROM orders WHERE store_id = $1 AND payment_status = 'SUCCESS'", 
+      [storeId]
+    );
+    
+    const totalOrders = parseInt(ordersResult.rows[0].total_orders, 10);
+    const totalRevenue = parseFloat(ordersResult.rows[0].total_revenue);
+
     res.json({ 
       success: true, 
       stats: { 
         products: activeProducts, 
-        orders: 0, 
-        revenue: 0 
+        orders: totalOrders, 
+        revenue: totalRevenue 
       } 
     });
   } catch (error) {
     console.error('Error fetching vendor stats:', error);
     res.status(500).json({ error: 'Server error fetching stats' });
+  }
+};
+
+// @desc    Get current vendor's recent orders
+// @route   GET /api/stores/my/orders
+const getVendorOrders = async (req, res) => {
+  const { getAuth } = require('@clerk/express');
+  const { userId } = getAuth(req);
+
+  try {
+    const userResult = await db.query('SELECT id FROM users WHERE clerk_user_id = $1', [userId]);
+    if (userResult.rows.length === 0) return res.status(401).json({ error: 'Unauthorized' });
+    const ownerUserId = userResult.rows[0].id;
+
+    const storeResult = await db.query('SELECT id FROM stores WHERE owner_user_id = $1', [ownerUserId]);
+    if (storeResult.rows.length === 0) return res.json({ success: true, orders: [] });
+    const storeId = storeResult.rows[0].id;
+
+    // Fetch orders with customer details
+    const ordersResult = await db.query(
+      `SELECT o.id, o.total_amount, o.order_status, o.created_at, u.name as customer_name, u.email as customer_email 
+       FROM orders o 
+       JOIN users u ON o.customer_user_id = u.id 
+       WHERE o.store_id = $1 AND o.payment_status = 'SUCCESS' 
+       ORDER BY o.created_at DESC`,
+      [storeId]
+    );
+
+    res.json({ success: true, orders: ordersResult.rows });
+  } catch (error) {
+    console.error('Error fetching vendor orders:', error);
+    res.status(500).json({ error: 'Server error fetching orders' });
   }
 };
 
@@ -225,6 +266,7 @@ module.exports = {
   getStoreById,
   getMyStore,
   getVendorStats,
+  getVendorOrders,
   createStore,
   updateStore,
   deleteStore

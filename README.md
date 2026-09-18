@@ -71,3 +71,10 @@ A user's role is stored in the database. When a user authenticates, their Clerk 
 ### Week 3 - Cart, Checkout & Payments
 - **Day 15:** Public Storefront UI (Home page listing active stores, Storefront grid, and Product Details page with dynamic variant selection).
 - **Day 16:** Shopping Cart implementation (Redux Global State, slide-over Cart panel, and live Subtotal calculations).
+- **Day 17:** Stripe Integration (Installed Stripe Node SDK, built `/api/payments/create-intent` endpoint to securely calculate totals and generate Stripe client secrets).
+- **Day 18:** Payment Verification & Webhooks (Built secure `/api/webhooks/stripe` endpoint using `express.raw()` to parse and cryptographically verify Stripe event signatures).
+- **Day 20:** Checkout Flow UI (Installed `@stripe/react-stripe-js`, built custom React checkout form that securely fetches client secrets and processes dummy card numbers).
+- **Day 21:** Order Confirmation Emails (Configured `@emailjs/nodejs` to automatically send email receipts via EmailJS inside the Stripe Webhook when a payment succeeds).
+
+### Week 4 - Analytics, Refinement & Deployment
+- **Day 22:** Vendor Analytics (Updated Vendor Dashboard to display real-time Total Revenue and Order Count by querying the new `orders` table, and added a Recent Orders list).
