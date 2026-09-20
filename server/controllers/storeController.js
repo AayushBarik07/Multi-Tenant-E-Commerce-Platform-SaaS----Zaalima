@@ -136,12 +136,25 @@ const getVendorStats = async (req, res) => {
     const totalOrders = parseInt(ordersResult.rows[0].total_orders, 10);
     const totalRevenue = parseFloat(ordersResult.rows[0].total_revenue);
 
+    // Vendor Revenue over time (Last 7 days)
+    const chartDataResult = await db.query(`
+      SELECT 
+        TO_CHAR(DATE(created_at), 'Mon DD') as date,
+        COALESCE(SUM(total_amount), 0) as revenue
+      FROM orders
+      WHERE store_id = $1 AND payment_status = 'SUCCESS'
+        AND created_at >= CURRENT_DATE - INTERVAL '6 days'
+      GROUP BY DATE(created_at)
+      ORDER BY DATE(created_at) ASC
+    `, [storeId]);
+
     res.json({ 
       success: true, 
       stats: { 
         products: activeProducts, 
         orders: totalOrders, 
-        revenue: totalRevenue 
+        revenue: totalRevenue,
+        revenueChartData: chartDataResult.rows
       } 
     });
   } catch (error) {
