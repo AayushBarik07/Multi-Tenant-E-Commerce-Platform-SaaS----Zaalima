@@ -1,7 +1,11 @@
 const db = require('../utils/db');
 
-// @desc    Get overall platform metrics
-// @route   GET /api/admin/stats
+/**
+ * @desc    Get overall platform metrics
+ * @route   GET /api/admin/stats
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const getPlatformStats = async (req, res) => {
   try {
     // Total Users
