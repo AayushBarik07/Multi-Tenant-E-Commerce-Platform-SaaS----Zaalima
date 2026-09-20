@@ -1,4 +1,5 @@
 const db = require('../utils/db');
+const { ROLES } = require('../utils/constants');
 const { getAuth } = require('@clerk/express');
 
 const requireRole = (allowedRoles) => {
@@ -27,8 +28,8 @@ const requireRole = (allowedRoles) => {
   };
 };
 
-const requireVendor = requireRole(['VENDOR', 'SUPER_ADMIN']);
-const requireSuperAdmin = requireRole(['SUPER_ADMIN']);
+const requireVendor = requireRole([ROLES.VENDOR, ROLES.SUPER_ADMIN]);
+const requireSuperAdmin = requireRole([ROLES.SUPER_ADMIN]);
 
 module.exports = {
   requireRole,
