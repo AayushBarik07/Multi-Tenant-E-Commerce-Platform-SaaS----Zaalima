@@ -34,18 +34,21 @@ app.get('/api/protected', requireAuth(), (req, res) => {
   });
 });
 
+const { errorHandler, notFound } = require('./middleware/errorHandler');
+
 // Setup basic routes mapping (to be expanded)
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/stores', require('./routes/stores'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/payments', require('./routes/payments'));
+app.use('/api/admin', require('./routes/admin'));
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
+// Fallback for 404 Not Found
+app.use(notFound);
+
+// Global Error Handler
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
