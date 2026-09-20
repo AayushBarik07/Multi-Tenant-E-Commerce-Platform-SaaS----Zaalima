@@ -1,7 +1,8 @@
 const db = require('../utils/db');
 
-// @desc    Get all active stores (Public)
-// @route   GET /api/stores
+/**
+ * @desc    Get all active stores (Public)
+ * @route   GET /api/stores
 const getStores = async (req, res) => {
   try {
     const result = await db.query(
@@ -15,8 +16,9 @@ const getStores = async (req, res) => {
   }
 };
 
-// @desc    Get a single store by ID (Public)
-// @route   GET /api/stores/:id
+/**
+ * @desc    Get a single store by ID (Public)
+ * @route   GET /api/stores/:id
 const getStoreById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -36,8 +38,12 @@ const getStoreById = async (req, res) => {
   }
 };
 
-// @desc    Create a new store (Vendor only)
-// @route   POST /api/stores
+/**
+ * @desc    Create a new store (Vendor only)
+ * @route   POST /api/stores
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const createStore = async (req, res) => {
   const { name, description, logo_url } = req.body;
   const { getAuth } = require('@clerk/express');
@@ -76,8 +82,9 @@ const createStore = async (req, res) => {
   }
 };
 
-// @desc    Get current vendor's store
-// @route   GET /api/stores/my-store
+/**
+ * @desc    Get current vendor's store
+ * @route   GET /api/stores/my-store
 const getMyStore = async (req, res) => {
   const { getAuth } = require('@clerk/express');
   const { userId } = getAuth(req);
@@ -102,8 +109,9 @@ const getMyStore = async (req, res) => {
   }
 };
 
-// @desc    Get current vendor's dashboard stats
-// @route   GET /api/stores/my/stats
+/**
+ * @desc    Get current vendor's dashboard stats
+ * @route   GET /api/stores/my/stats
 const getVendorStats = async (req, res) => {
   const { getAuth } = require('@clerk/express');
   const { userId } = getAuth(req);
@@ -163,8 +171,9 @@ const getVendorStats = async (req, res) => {
   }
 };
 
-// @desc    Get current vendor's recent orders
-// @route   GET /api/stores/my/orders
+/**
+ * @desc    Get current vendor's recent orders
+ * @route   GET /api/stores/my/orders
 const getVendorOrders = async (req, res) => {
   const { getAuth } = require('@clerk/express');
   const { userId } = getAuth(req);
@@ -195,8 +204,9 @@ const getVendorOrders = async (req, res) => {
   }
 };
 
-// @desc    Update a store (Vendor only, must own the store)
-// @route   PATCH /api/stores/:id
+/**
+ * @desc    Update a store (Vendor only, must own the store)
+ * @route   PATCH /api/stores/:id
 const updateStore = async (req, res) => {
   const { id } = req.params;
   const { name, description, logo_url, status } = req.body;
@@ -242,8 +252,9 @@ const updateStore = async (req, res) => {
   }
 };
 
-// @desc    Delete a store (Vendor only, must own the store)
-// @route   DELETE /api/stores/:id
+/**
+ * @desc    Delete a store (Vendor only, must own the store)
+ * @route   DELETE /api/stores/:id
 const deleteStore = async (req, res) => {
   const { id } = req.params;
   const { getAuth } = require('@clerk/express');
