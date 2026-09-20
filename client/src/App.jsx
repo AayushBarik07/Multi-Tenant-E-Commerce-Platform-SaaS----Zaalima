@@ -14,6 +14,8 @@ import ProductDetails from './pages/public/ProductDetails';
 import Checkout from './pages/public/Checkout';
 import CartDrawer from './components/public/CartDrawer';
 import { toggleCart } from './redux/slices/cartSlice';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 function SyncUser({ children }) {
   const { isLoaded, userId, getToken } = useAuth();
@@ -57,18 +59,45 @@ function SyncUser({ children }) {
 
 function RoleDashboard() {
   const dbUser = useSelector(state => state.auth.user);
+  const { isLoaded } = useAuth();
   
-  if (!dbUser) return <div>Loading...</div>;
+  if (!isLoaded || !dbUser) return <div className="p-8 text-center">Loading dashboard...</div>;
 
   switch (dbUser.role) {
     case 'SUPER_ADMIN':
-      return <div><h2 className="text-2xl font-bold">Admin Dashboard</h2><p>Welcome Admin!</p></div>;
+      return <Navigate to="/admin" />;
     case 'VENDOR':
       return <Navigate to="/vendor" />;
     case 'CUSTOMER':
     default:
-      return <div><h2 className="text-2xl font-bold">Customer Dashboard</h2><p>Welcome back!</p></div>;
+      return (
+        <div className="p-8 text-center">
+          <h2 className="text-2xl font-bold mb-4">Customer Dashboard</h2>
+          <p className="text-gray-600 mb-4">Welcome back to Zaalima!</p>
+          <Link to="/" className="text-indigo-600 hover:underline">Start Shopping</Link>
+        </div>
+      );
   }
+}
+
+// Security Guard for specific roles
+function RequireRole({ children, allowedRoles }) {
+  const dbUser = useSelector(state => state.auth.user);
+  const { isLoaded, isSignedIn } = useAuth();
+
+  if (!isLoaded) return <div className="p-8 text-center">Checking permissions...</div>;
+  
+  if (!isSignedIn) return <Navigate to="/sign-in" />;
+
+  // Wait for our database sync to finish
+  if (isSignedIn && !dbUser) return <div className="p-8 text-center">Loading profile...</div>;
+
+  if (dbUser && !allowedRoles.includes(dbUser.role)) {
+    // Kicks unauthorized users back to the safe Customer Dashboard area
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
 }
 
 function App() {
@@ -135,11 +164,20 @@ function App() {
                 </>
               } />
               
-              {/* Vendor Routes */}
+              {/* Protected Admin Routes */}
+              <Route path="/admin" element={
+                <RequireRole allowedRoles={['SUPER_ADMIN']}>
+                  <AdminLayout />
+                </RequireRole>
+              }>
+                <Route index element={<AdminDashboard />} />
+              </Route>
+
+              {/* Protected Vendor Routes */}
               <Route path="/vendor" element={
-                <SignedIn>
+                <RequireRole allowedRoles={['VENDOR', 'SUPER_ADMIN']}>
                   <VendorLayout />
-                </SignedIn>
+                </RequireRole>
               }>
                 <Route index element={<VendorDashboard />} />
                 <Route path="store" element={<StoreSettings />} />
