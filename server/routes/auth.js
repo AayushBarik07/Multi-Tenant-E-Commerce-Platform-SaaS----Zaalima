@@ -47,4 +47,35 @@ router.post('/sync', async (req, res) => {
   }
 });
 
+// Upgrade user to Vendor
+router.post('/become-vendor', async (req, res) => {
+  const { userId } = getAuth(req);
+  if (!userId) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const userResult = await db.query('SELECT role FROM users WHERE clerk_user_id = $1', [userId]);
+    
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    if (userResult.rows[0].role === 'SUPER_ADMIN') {
+      return res.status(400).json({ error: 'Super Admins do not need to upgrade' });
+    }
+
+    // Upgrade to VENDOR
+    const updatedUser = await db.query(
+      "UPDATE users SET role = 'VENDOR' WHERE clerk_user_id = $1 RETURNING *",
+      [userId]
+    );
+
+    res.json({ success: true, user: updatedUser.rows[0] });
+  } catch (error) {
+    console.error('Error upgrading to vendor:', error);
+    res.status(500).json({ error: 'Failed to upgrade account' });
+  }
+});
+
 module.exports = router;

@@ -74,32 +74,32 @@ const Storefront = () => {
           This store has no active products at the moment.
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-y-10 sm:grid-cols-2 gap-x-6 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
+        <div className="mt-6 grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
           {products.map((product) => (
-            <Link key={product.id} to={`/product/${product.id}`} className="group block">
-              <div className="w-full aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden xl:aspect-w-7 xl:aspect-h-8 shadow-sm group-hover:shadow-md transition-shadow relative">
+            <Link key={product.id} to={`/product/${product.id}`} className="group relative block bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 overflow-hidden border border-gray-100">
+              <div className="w-full aspect-w-1 aspect-h-1 bg-gray-100 overflow-hidden">
                 {product.image_url ? (
                   <img
                     src={product.image_url}
                     alt={product.name}
-                    className="w-full h-64 object-cover object-center group-hover:opacity-75"
+                    className="w-full h-64 object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-in-out"
                   />
                 ) : (
-                  <div className="w-full h-64 bg-gray-100 flex items-center justify-center text-gray-400 text-sm">
-                    No Image
+                  <div className="w-full h-64 flex items-center justify-center bg-gray-200 text-gray-400">
+                    <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                   </div>
                 )}
-                {product.stock <= 0 && (
-                  <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">
-                    OUT OF STOCK
-                  </div>
-                )}
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-5 transition-opacity duration-300"></div>
               </div>
-              <div className="mt-4 flex justify-between">
+              <div className="p-5 flex flex-col justify-between h-36">
                 <div>
-                  <h3 className="text-sm text-gray-700 font-medium">{product.name}</h3>
+                  <h3 className="text-xs font-semibold text-gray-400 tracking-wider uppercase mb-1">{store.name}</h3>
+                  <p className="text-lg font-bold text-gray-900 line-clamp-2 leading-tight">{product.name}</p>
                 </div>
-                <p className="text-sm font-bold text-gray-900">${parseFloat(product.price).toFixed(2)}</p>
+                <div className="flex items-center justify-between mt-3">
+                  <p className="text-xl font-extrabold text-indigo-600">${parseFloat(product.price).toFixed(2)}</p>
+                  <span className="text-xs font-bold px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full transition-colors">View</span>
+                </div>
               </div>
             </Link>
           ))}

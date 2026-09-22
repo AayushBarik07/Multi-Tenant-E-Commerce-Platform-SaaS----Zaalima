@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom';
-import { SignedIn, SignedOut, SignIn, SignUp, UserButton, useAuth, useUser } from '@clerk/clerk-react';
+import { SignedIn, SignedOut, SignIn, SignUp, UserButton, SignInButton, SignUpButton, useAuth, useUser } from '@clerk/clerk-react';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser, clearUser } from './redux/slices/authSlice';
@@ -12,6 +12,7 @@ import Home from './pages/public/Home';
 import Storefront from './pages/public/Storefront';
 import ProductDetails from './pages/public/ProductDetails';
 import Checkout from './pages/public/Checkout';
+import BecomeVendor from './pages/public/BecomeVendor';
 import CartDrawer from './components/public/CartDrawer';
 import { toggleCart } from './redux/slices/cartSlice';
 import AdminLayout from './components/admin/AdminLayout';
@@ -102,6 +103,7 @@ function RequireRole({ children, allowedRoles }) {
 
 function App() {
   const dispatch = useDispatch();
+  const dbUser = useSelector(state => state.auth.user);
   const cartItemsCount = useSelector(state => state.cart.items.reduce((acc, item) => acc + item.quantity, 0));
 
   return (
@@ -111,10 +113,17 @@ function App() {
           {/* Basic Header */}
           <header className="bg-white shadow-sm p-4 flex justify-between items-center relative z-10">
             <Link to="/" className="text-xl font-bold text-indigo-600 hover:text-indigo-700">Zaalima</Link>
-            <nav className="flex items-center">
+            <nav className="flex items-center space-x-6">
+              {/* Become a Vendor Link (Only for Customers or logged out users) */}
+              {(!dbUser || dbUser.role === 'CUSTOMER') && (
+                <Link to="/become-vendor" className="text-gray-600 hover:text-indigo-600 font-medium text-sm">
+                  Sell on Zaalima
+                </Link>
+              )}
+
               <button 
                 onClick={() => dispatch(toggleCart())}
-                className="mr-6 relative text-gray-600 hover:text-indigo-600 flex items-center"
+                className="text-gray-600 hover:text-gray-900 relative"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -131,8 +140,12 @@ function App() {
                 <UserButton />
               </SignedIn>
               <SignedOut>
-                <Link to="/sign-in" className="text-indigo-600 font-medium hover:underline mr-4">Sign In</Link>
-                <Link to="/sign-up" className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Sign Up</Link>
+                <SignInButton mode="modal" fallbackRedirectUrl="/">
+                  <button className="text-indigo-600 font-medium hover:underline mr-4">Sign In</button>
+                </SignInButton>
+                <SignUpButton mode="modal" fallbackRedirectUrl="/">
+                  <button className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Sign Up</button>
+                </SignUpButton>
               </SignedOut>
             </nav>
           </header>
@@ -145,6 +158,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/store/:storeId" element={<Storefront />} />
               <Route path="/product/:id" element={<ProductDetails />} />
+              <Route path="/become-vendor" element={<BecomeVendor />} />
               <Route path="/checkout" element={
                 <SignedIn>
                   <Checkout />
