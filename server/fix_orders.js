@@ -1,0 +1,1 @@
+require('./utils/db').query("UPDATE orders SET payment_status = 'SUCCESS', order_status = 'CONFIRMED' WHERE payment_status = 'PENDING'").then(res => console.log(res.rowCount + ' orders fixed')).catch(console.error).finally(() => process.exit(0));

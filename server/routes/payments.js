@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createPaymentIntent } = require('../controllers/paymentController');
+const { createPaymentIntent, confirmPayment } = require('../controllers/paymentController');
 const { getAuth } = require('@clerk/express');
 
 // Middleware to verify user is authenticated for checkout
@@ -13,5 +13,6 @@ const requireAuth = (req, res, next) => {
 };
 
 router.post('/create-intent', requireAuth, createPaymentIntent);
+router.post('/confirm', requireAuth, confirmPayment);
 
 module.exports = router;

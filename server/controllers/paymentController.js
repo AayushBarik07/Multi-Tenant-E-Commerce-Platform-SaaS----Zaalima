@@ -75,6 +75,41 @@ const createPaymentIntent = async (req, res) => {
   }
 };
 
+// @desc    Confirm payment and update order status
+// @route   POST /api/payments/confirm
+const confirmPayment = async (req, res) => {
+  const { paymentIntentId } = req.body;
+  const { userId } = getAuth(req);
+
+  if (!paymentIntentId) {
+    return res.status(400).json({ error: 'Missing paymentIntentId' });
+  }
+
+  try {
+    // Ideally verify with Stripe API that it is actually succeeded
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    
+    if (paymentIntent.status === 'succeeded') {
+      const result = await db.query(
+        "UPDATE orders SET payment_status = 'SUCCESS', order_status = 'CONFIRMED' WHERE payment_reference = $1 RETURNING *",
+        [paymentIntentId]
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
+
+      res.json({ success: true, order: result.rows[0] });
+    } else {
+      res.status(400).json({ error: 'Payment not successful in Stripe' });
+    }
+  } catch (error) {
+    console.error('Error confirming payment:', error);
+    res.status(500).json({ error: 'Server error confirming payment' });
+  }
+};
+
 module.exports = {
-  createPaymentIntent
+  createPaymentIntent,
+  confirmPayment
 };
