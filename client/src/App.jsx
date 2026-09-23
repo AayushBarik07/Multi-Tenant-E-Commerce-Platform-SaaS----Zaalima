@@ -17,6 +17,13 @@ import CartDrawer from './components/public/CartDrawer';
 import { toggleCart } from './redux/slices/cartSlice';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminStores from './pages/admin/AdminStores';
+import AdminProducts from './pages/admin/AdminProducts';
+import AdminOrders from './pages/admin/AdminOrders';
+import AdminPayouts from './pages/admin/AdminPayouts';
+import BrandManager from './pages/vendor/BrandManager';
+import VendorOrders from './pages/vendor/VendorOrders';
+import VendorWallet from './pages/vendor/VendorWallet';
 
 function SyncUser({ children }) {
   const { isLoaded, userId, getToken } = useAuth();
@@ -136,8 +143,21 @@ function App() {
               </button>
               
               <SignedIn>
-                <Link to="/dashboard" className="mr-4 font-medium text-gray-700 hover:text-indigo-600">Dashboard</Link>
-                <UserButton />
+                <div className="flex items-center space-x-4 border-l border-gray-200 pl-4 ml-2">
+                  {dbUser && (
+                    <span className={`hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide border ${
+                      dbUser.role === 'SUPER_ADMIN' 
+                        ? 'bg-purple-50 text-purple-700 border-purple-200' 
+                        : dbUser.role === 'VENDOR'
+                        ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
+                        : 'bg-gray-50 text-gray-500 border-gray-200'
+                    }`}>
+                      {dbUser.role === 'SUPER_ADMIN' ? 'Admin Account' : dbUser.role === 'VENDOR' ? 'Vendor Account' : 'Customer Account'}
+                    </span>
+                  )}
+                  <Link to="/dashboard" className="font-medium text-gray-700 hover:text-indigo-600 text-sm">Dashboard</Link>
+                  <UserButton />
+                </div>
               </SignedIn>
               <SignedOut>
                 <SignInButton mode="modal" fallbackRedirectUrl="/">
@@ -185,6 +205,10 @@ function App() {
                 </RequireRole>
               }>
                 <Route index element={<AdminDashboard />} />
+                <Route path="stores" element={<AdminStores />} />
+                <Route path="products" element={<AdminProducts />} />
+                <Route path="orders" element={<AdminOrders />} />
+                <Route path="payouts" element={<AdminPayouts />} />
               </Route>
 
               {/* Protected Vendor Routes */}
@@ -195,8 +219,11 @@ function App() {
               }>
                 <Route index element={<VendorDashboard />} />
                 <Route path="store" element={<StoreSettings />} />
+                <Route path="brands" element={<BrandManager />} />
                 <Route path="products" element={<ProductsList />} />
                 <Route path="products/:id" element={<ProductForm />} />
+                <Route path="orders" element={<VendorOrders />} />
+                <Route path="wallet" element={<VendorWallet />} />
               </Route>
             </Routes>
           </main>
