@@ -10,8 +10,7 @@ const CartDrawer = () => {
   if (!isOpen) return null;
 
   const subtotal = items.reduce((total, item) => {
-    const itemPrice = parseFloat(item.product.price) + 
-      (item.variant ? parseFloat(item.variant.price_adjustment) : 0);
+    const itemPrice = item.variant ? parseFloat(item.variant.price) : parseFloat(item.product.price);
     return total + (itemPrice * item.quantity);
   }, 0);
 

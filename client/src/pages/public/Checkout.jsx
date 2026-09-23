@@ -14,6 +14,7 @@ const CheckoutForm = ({ clientSecret }) => {
   const elements = useElements();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { getToken } = useAuth();
 
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +38,20 @@ const CheckoutForm = ({ clientSecret }) => {
         setMessage('An unexpected error occurred.');
       }
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      try {
+        const token = await getToken();
+        await fetch(`${import.meta.env.VITE_API_URL}/payments/confirm`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({ paymentIntentId: paymentIntent.id })
+        });
+      } catch (err) {
+        console.error('Error confirming with backend:', err);
+      }
+
       // Payment successful!
       setMessage('Payment successful! Your order has been placed.');
       dispatch(clearCart());
@@ -158,8 +173,7 @@ const Checkout = () => {
   };
 
   const subtotal = items.reduce((total, item) => {
-    const itemPrice = parseFloat(item.product.price) + 
-      (item.variant ? parseFloat(item.variant.price_adjustment) : 0);
+    const itemPrice = item.variant ? parseFloat(item.variant.price) : parseFloat(item.product.price);
     return total + (itemPrice * item.quantity);
   }, 0);
 
@@ -190,7 +204,7 @@ const Checkout = () => {
               <div className="px-6 py-6 max-h-[60vh] overflow-y-auto">
                 <ul className="divide-y divide-gray-100">
                   {items.map((item) => {
-                    const price = parseFloat(item.product.price) + (item.variant ? parseFloat(item.variant.price_adjustment) : 0);
+                    const price = item.variant ? parseFloat(item.variant.price) : parseFloat(item.product.price);
                     return (
                       <li key={item.cartItemId} className="py-5 flex items-center group">
                         <div className="relative shrink-0 overflow-hidden rounded-xl bg-gray-100 w-20 h-20">
@@ -207,7 +221,7 @@ const Checkout = () => {
                         </div>
                         <div className="ml-4 flex-1">
                           <h3 className="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{item.product.name}</h3>
-                          {item.variant && <p className="mt-1 text-xs text-gray-500 font-medium">{item.variant.name}: {item.variant.value}</p>}
+                          {item.variant && <p className="mt-1 text-xs text-gray-500 font-medium">Variant: {item.variant.name}</p>}
                         </div>
                         <p className="text-base font-bold text-gray-900 ml-4">${(price * item.quantity).toFixed(2)}</p>
                       </li>

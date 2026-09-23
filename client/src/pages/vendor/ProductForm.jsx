@@ -11,6 +11,7 @@ const ProductForm = () => {
   const [loading, setLoading] = useState(isEditing);
   const [saving, setSaving] = useState(false);
   const [storeId, setStoreId] = useState(null);
+  const [brands, setBrands] = useState([]);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [variants, setVariants] = useState([]);
@@ -21,7 +22,8 @@ const ProductForm = () => {
     price: '',
     stock: '',
     status: 'ACTIVE',
-    image_url: ''
+    image_url: '',
+    brand_id: ''
   });
 
   useEffect(() => {
@@ -34,8 +36,17 @@ const ProductForm = () => {
         });
         const storeData = await storeRes.json();
         
+        let foundStoreId = null;
         if (storeData.success && storeData.store) {
-          setStoreId(storeData.store.id);
+          foundStoreId = storeData.store.id;
+          setStoreId(foundStoreId);
+          
+          // Fetch brands for this store
+          const brandsRes = await fetch(`${import.meta.env.VITE_API_URL}/brands?store_id=${foundStoreId}`);
+          const brandsData = await brandsRes.json();
+          if (brandsData.success) {
+            setBrands(brandsData.brands);
+          }
         } else {
           setError('You must create a store before adding products.');
           setLoading(false);
@@ -55,7 +66,8 @@ const ProductForm = () => {
               price: prodData.product.price,
               stock: prodData.product.stock,
               status: prodData.product.status,
-              image_url: prodData.product.image_url || ''
+              image_url: prodData.product.image_url || '',
+              brand_id: prodData.product.brand_id || ''
             });
             setVariants(prodData.product.variants || []);
           } else {
@@ -148,28 +160,35 @@ const ProductForm = () => {
     }
   };
 
-  const [newVariant, setNewVariant] = useState({ name: '', value: '', price_adjustment: 0, stock: 0 });
+  const [newVariant, setNewVariant] = useState({ name: '', price: '', stock: 0 });
   const [addingVariant, setAddingVariant] = useState(false);
 
   const handleAddVariant = async (e) => {
     e.preventDefault();
-    if (!newVariant.name || !newVariant.value) return;
+    if (!newVariant.name) return;
     setAddingVariant(true);
 
     try {
       const token = await getToken();
+      // If price is empty, default to base product price
+      const variantPayload = {
+        name: newVariant.name,
+        price: newVariant.price !== '' ? parseFloat(newVariant.price) : parseFloat(formData.price),
+        stock: parseInt(newVariant.stock) || 0
+      };
+
       const res = await fetch(`${import.meta.env.VITE_API_URL}/products/${id}/variants`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify(newVariant)
+        body: JSON.stringify(variantPayload)
       });
       const data = await res.json();
       if (data.success) {
         setVariants([...variants, data.variant]);
-        setNewVariant({ name: '', value: '', price_adjustment: 0, stock: 0 });
+        setNewVariant({ name: '', price: '', stock: 0 });
       } else {
         alert(data.error || 'Failed to add variant');
       }
@@ -226,6 +245,20 @@ const ProductForm = () => {
               value={formData.name}
               onChange={e => setFormData({...formData, name: e.target.value})}
             />
+          </div>
+          
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-700">Brand Collection</label>
+            <select 
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border p-2 bg-white"
+              value={formData.brand_id || ''}
+              onChange={e => setFormData({...formData, brand_id: e.target.value})}
+            >
+              <option value="">-- No Brand (Uncategorized) --</option>
+              {brands.map(brand => (
+                <option key={brand.id} value={brand.id}>{brand.name}</option>
+              ))}
+            </select>
           </div>
 
           <div className="md:col-span-2">
@@ -320,9 +353,8 @@ const ProductForm = () => {
               <table className="w-full text-left">
                 <thead>
                   <tr className="text-gray-500 text-sm border-b">
-                    <th className="pb-2">Type</th>
-                    <th className="pb-2">Value</th>
-                    <th className="pb-2">Price Adj.</th>
+                    <th className="pb-2">Variant Details (e.g. Size M / Blue)</th>
+                    <th className="pb-2">Exact Price ($)</th>
                     <th className="pb-2">Stock</th>
                     <th className="pb-2">Action</th>
                   </tr>
@@ -331,8 +363,7 @@ const ProductForm = () => {
                   {variants.map(v => (
                     <tr key={v.id} className="border-b last:border-0">
                       <td className="py-3 font-medium">{v.name}</td>
-                      <td className="py-3">{v.value}</td>
-                      <td className="py-3">${parseFloat(v.price_adjustment).toFixed(2)}</td>
+                      <td className="py-3">${parseFloat(v.price).toFixed(2)}</td>
                       <td className="py-3">{v.stock}</td>
                       <td className="py-3">
                         <button 
@@ -348,41 +379,31 @@ const ProductForm = () => {
               </table>
             </div>
           ) : (
-            <p className="text-gray-500 mb-6 text-sm">No variants added yet. Add sizes or colors below.</p>
+            <p className="text-gray-500 mb-6 text-sm">No variants added yet. Add variants like "Small / Blue" below.</p>
           )}
 
           {/* Add Variant Form */}
           <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
             <h4 className="text-md font-semibold text-gray-700 mb-4">Add New Variant</h4>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Type (e.g. Size, Color)</label>
+                <label className="block text-xs text-gray-500 mb-1">Variant Name (e.g. Large / Red)</label>
                 <input 
                   type="text" 
                   className="w-full rounded border p-2 text-sm" 
-                  placeholder="Size"
+                  placeholder="Large / Red"
                   value={newVariant.name}
                   onChange={e => setNewVariant({...newVariant, name: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Value (e.g. 10, Red)</label>
-                <input 
-                  type="text" 
-                  className="w-full rounded border p-2 text-sm" 
-                  placeholder="10"
-                  value={newVariant.value}
-                  onChange={e => setNewVariant({...newVariant, value: e.target.value})}
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-gray-500 mb-1">Price Adjust ($)</label>
+                <label className="block text-xs text-gray-500 mb-1">Price ($)</label>
                 <input 
                   type="number" step="0.01" 
                   className="w-full rounded border p-2 text-sm" 
-                  placeholder="0.00"
-                  value={newVariant.price_adjustment}
-                  onChange={e => setNewVariant({...newVariant, price_adjustment: e.target.value})}
+                  placeholder={formData.price || "0.00"}
+                  value={newVariant.price}
+                  onChange={e => setNewVariant({...newVariant, price: e.target.value})}
                 />
               </div>
               <div>
@@ -398,7 +419,7 @@ const ProductForm = () => {
             </div>
             <button 
               onClick={handleAddVariant}
-              disabled={addingVariant || !newVariant.name || !newVariant.value}
+              disabled={addingVariant || !newVariant.name}
               className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded text-sm font-medium hover:bg-indigo-200 disabled:opacity-50"
             >
               {addingVariant ? 'Adding...' : '+ Add Variant'}

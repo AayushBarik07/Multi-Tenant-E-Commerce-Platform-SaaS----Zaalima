@@ -39,7 +39,7 @@ const ProductDetails = () => {
   if (error || !product) return <div className="text-center py-20 text-red-500">{error || 'Product not found'}</div>;
 
   const displayPrice = selectedVariant 
-    ? parseFloat(product.price) + parseFloat(selectedVariant.price_adjustment) 
+    ? parseFloat(selectedVariant.price) 
     : parseFloat(product.price);
     
   const displayStock = selectedVariant ? selectedVariant.stock : product.stock;
@@ -60,11 +60,11 @@ const ProductDetails = () => {
       <div className="lg:grid lg:grid-cols-2 lg:gap-x-8 lg:items-start">
         {/* Image gallery */}
         <div className="flex flex-col-reverse">
-          <div className="w-full aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden relative">
+          <div className="w-full h-96 bg-gray-50 rounded-lg overflow-hidden relative flex items-center justify-center p-4">
             {product.image_url ? (
-              <img src={product.image_url} alt={product.name} className="w-full h-96 object-cover object-center sm:h-full" />
+              <img src={product.image_url} alt={product.name} className="max-w-full max-h-full object-contain" />
             ) : (
-              <div className="w-full h-96 bg-gray-100 flex items-center justify-center text-gray-400">No Image Available</div>
+              <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-400">No Image Available</div>
             )}
             
             {displayStock <= 0 && (
@@ -94,8 +94,8 @@ const ProductDetails = () => {
           {/* Variants Selection */}
           {product.variants && product.variants.length > 0 && (
             <div className="mt-8">
-              <h3 className="text-sm text-gray-900 font-medium">Options ({product.variants[0].name})</h3>
-              <div className="mt-4 grid grid-cols-4 gap-3 sm:grid-cols-8 lg:grid-cols-4 xl:grid-cols-8">
+              <h3 className="text-sm text-gray-900 font-medium">Select Option</h3>
+              <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
                 {product.variants.map(variant => (
                   <button
                     key={variant.id}
@@ -110,7 +110,7 @@ const ProductDetails = () => {
                       ${variant.stock <= 0 ? 'opacity-25 cursor-not-allowed' : 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}
                     `}
                   >
-                    {variant.value}
+                    {variant.name}
                   </button>
                 ))}
               </div>
