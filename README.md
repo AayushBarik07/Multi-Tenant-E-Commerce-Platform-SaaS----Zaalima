@@ -1,4 +1,4 @@
-# Zaalima Multi-Tenant E-Commerce SaaS Platform
+# EComVerse Multi-Tenant E-Commerce SaaS Platform
 
 A comprehensive multi-vendor e-commerce platform designed to allow independent vendors to open stores, manage inventory, and process orders, while providing customers with a seamless, global shopping experience. 
 
