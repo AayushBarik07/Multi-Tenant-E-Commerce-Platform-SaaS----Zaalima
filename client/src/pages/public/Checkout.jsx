@@ -53,11 +53,8 @@ const CheckoutForm = ({ clientSecret }) => {
       }
 
       // Payment successful!
-      setMessage('Payment successful! Your order has been placed.');
       dispatch(clearCart());
-      setTimeout(() => {
-        navigate('/'); // Redirect to home or an order success page
-      }, 3000);
+      navigate(`/success/${paymentIntent.id}`);
     }
 
     setIsLoading(false);
@@ -96,7 +93,10 @@ const CheckoutForm = ({ clientSecret }) => {
 const Checkout = () => {
   const [clientSecret, setClientSecret] = useState("");
   const { items } = useSelector(state => state.cart);
+  const dbUser = useSelector(state => state.auth.user);
   const { getToken } = useAuth();
+  
+  const isAdmin = dbUser?.role === 'SUPER_ADMIN';
 
   useEffect(() => {
     if (items.length === 0) return;
@@ -126,6 +126,18 @@ const Checkout = () => {
 
     createPaymentIntent();
   }, [items, getToken]);
+
+  if (isAdmin) {
+    return (
+      <div className="max-w-3xl mx-auto py-20 text-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Super Admins Cannot Shop</h2>
+        <p className="text-gray-500 mb-8">Your account is restricted to read-only supervision.</p>
+        <a href="/" className="bg-indigo-600 text-white px-6 py-3 rounded-md font-medium hover:bg-indigo-700">
+          Return Home
+        </a>
+      </div>
+    );
+  }
 
   if (items.length === 0) {
     return (
