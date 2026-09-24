@@ -15,6 +15,7 @@ import Checkout from './pages/public/Checkout';
 import Success from './pages/public/Success';
 import BecomeVendor from './pages/public/BecomeVendor';
 import CartDrawer from './components/public/CartDrawer';
+import Footer from './components/Footer';
 import { toggleCart } from './redux/slices/cartSlice';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -82,7 +83,7 @@ function RoleDashboard() {
       return (
         <div className="p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">Customer Dashboard</h2>
-          <p className="text-gray-600 mb-4">Welcome back to Zaalima!</p>
+          <p className="text-gray-600 mb-4">Welcome back to EComVerse!</p>
           <Link to="/" className="text-indigo-600 hover:underline">Start Shopping</Link>
         </div>
       );
@@ -120,12 +121,12 @@ function App() {
         <div className="min-h-screen bg-gray-50 flex flex-col">
           {/* Basic Header */}
           <header className="bg-white shadow-sm p-4 flex justify-between items-center relative z-10">
-            <Link to="/" className="text-xl font-bold text-indigo-600 hover:text-indigo-700">Zaalima</Link>
+            <Link to="/" className="text-xl font-bold text-indigo-600 hover:text-indigo-700">EComVerse</Link>
             <nav className="flex items-center space-x-6">
               {/* Become a Vendor Link (Only for Customers or logged out users) */}
               {(!dbUser || dbUser.role === 'CUSTOMER') && (
                 <Link to="/become-vendor" className="text-gray-600 hover:text-indigo-600 font-medium text-sm">
-                  Sell on Zaalima
+                  Sell on EComVerse
                 </Link>
               )}
 
@@ -232,6 +233,7 @@ function App() {
               </Route>
             </Routes>
           </main>
+          <Footer />
         </div>
       </SyncUser>
     </Router>
