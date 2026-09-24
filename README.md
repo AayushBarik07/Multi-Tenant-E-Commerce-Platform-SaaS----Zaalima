@@ -1,6 +1,29 @@
-# OmniStore (Zaalima Multi-Tenant E-Commerce Platform)
+# Zaalima Multi-Tenant E-Commerce SaaS Platform
 
-This repository contains the Zaalima Project 1 Multi-Tenant E-Commerce Platform.
+A comprehensive multi-vendor e-commerce platform designed to allow independent vendors to open stores, manage inventory, and process orders, while providing customers with a seamless, global shopping experience. 
+
+## 🚀 Latest Updates (v1.1)
+
+We have recently shipped several major improvements to the platform:
+- **Transaction ID Tracking:** Exposed Stripe Payment Intent IDs (`payment_reference`) to both the Admin Global Transactions and Vendor Store Orders dashboards for seamless payment tracing.
+- **Customer Success Flow:** Built a dedicated `/success` screen post-checkout that displays the transaction ID, payment method, and an estimated delivery date instead of immediately clearing the cart and returning to the homepage.
+- **Vendor Catalog Categorization:** Introduced a smart `Category` tagging system. Vendors can now assign categories (e.g., Clothing, Electronics) to their products via the Product Form, which is organized in their inventory lists but kept hidden from the public storefront.
+- **Admin UI Security Lockout:** Super Admins are now strictly blocked from acting as customers. The shopping cart is completely hidden from the Admin navigation, the "Add to Cart" button is disabled on product pages, and the checkout flow is fully locked down with a custom error screen.
+- **Global Catalog Image Viewer:** Added an interactive "View Image" modal to the Super Admin's Global Product Catalog for quick visual inventory checks.
+- **Variant Pricing Fixes:** Upgraded the backend Stripe payment calculation logic to fully support exact-pricing flat variants.
+
+---
+
+## Key Features
+
+- 🛡️ **Role-Based Authentication (Clerk):** Secure authentication with strict role-based access control (`CUSTOMER`, `VENDOR`, `SUPER_ADMIN`).
+- 🏪 **Multi-Vendor Architecture:** Isolated vendor dashboards, individual store profiles, and global admin oversight.
+- 💳 **Secure Payments (Stripe):** Integrated Stripe checkout for secure credit card processing, complete with transaction IDs and automated customer success flows.
+- 💰 **Wallet & Payout System:** Vendors accumulate earnings minus a platform commission (e.g., 5%) and can request payouts from the Super Admin.
+- 📦 **Advanced Inventory Management:** Support for product variants (sizes/colors), dynamic stock validation, category tagging, and Cloudinary-powered image uploads.
+- 📊 **Real-Time Analytics (Recharts):** Interactive visual dashboards for both vendors and admins to track revenue over time.
+
+---
 
 ## Project Structure
 
@@ -12,7 +35,7 @@ This repository contains the Zaalima Project 1 Multi-Tenant E-Commerce Platform.
 
 ### 1. Database Setup
 1. Create a new project on [Supabase](https://supabase.com).
-2. Go to the SQL Editor and run the SQL provided in `database.sql`.
+2. Go to the SQL Editor and run the SQL provided in `database.sql` and `server/migrate_features.js`.
 3. Obtain your database URL and API keys.
 
 ### 2. Authentication Setup
@@ -30,7 +53,7 @@ This repository contains the Zaalima Project 1 Multi-Tenant E-Commerce Platform.
    STRIPE_SECRET_KEY=your_stripe_test_secret_key
    CLOUDINARY_URL=your_cloudinary_url
    ```
-3. Start the server: `node index.js` (or `npm run dev` if nodemon is configured)
+3. Start the server: `node index.js`
 
 ### 4. Frontend Setup
 1. Navigate to the `client/` directory: `cd client`
@@ -38,13 +61,10 @@ This repository contains the Zaalima Project 1 Multi-Tenant E-Commerce Platform.
    ```env
    VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
    VITE_API_URL=http://localhost:5000/api
+   VITE_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable_key
    ```
 3. Install dependencies: `npm install`
 4. Start the development server: `npm run dev`
-
-## Roles
-The system supports three roles: `SUPER_ADMIN`, `VENDOR`, `CUSTOMER`.
-A user's role is stored in the database. When a user authenticates, their Clerk ID is matched with the database record to determine their access level.
 
 ---
 
@@ -59,28 +79,28 @@ A user's role is stored in the database. When a user authenticates, their Clerk 
 - **Day 6:** React frontend setup with Vite, Tailwind CSS v4, Redux Toolkit, and React Router.
 - **Day 7:** Login/Register UI flows, Role-based dashboards scaffold, and Redux User State synchronization.
 
-### Week 2 - Inventory & Store Management
+### Week 2 - Inventory & Store Management (COMPLETED)
 - **Day 8:** Store API endpoints (Create & Read operations) with Vendor role protection.
 - **Day 9:** Store API endpoints (Update, Delete) and robust Cloudinary image upload setup via `/api/upload`.
 - **Day 10:** Product API endpoints (CRUD) with Store ownership verification.
 - **Day 11:** Vendor Dashboard Layout (Sidebar/Navbar) & functional Store Settings React UI to create/update stores and upload logos.
-- **Day 12:** Product Management UI (Add/Edit products, Upload images) to connect the React frontend to the backend Product CRUD APIs.
-- **Day 13:** Inventory, Pricing, and Variants Logic Implementation (adding support for Sizes, Colors, and dynamic stock/pricing in backend and frontend UI).
-- **Day 14:** Store & Product Frontend/Backend Integration Testing & Polish (built Vendor Dashboard dynamic statistics API to track total products and revenue).
+- **Day 12:** Product Management UI (Add/Edit products, Upload images, Category tagging).
+- **Day 13:** Inventory, Pricing, and Variants Logic Implementation (adding support for exact pricing variants and dynamic stock/pricing in backend and frontend UI).
+- **Day 14:** Store & Product Frontend/Backend Integration Testing & Polish.
 
-### Week 3 - Cart, Checkout & Payments
+### Week 3 - Cart, Checkout & Payments (COMPLETED)
 - **Day 15:** Public Storefront UI (Home page listing active stores, Storefront grid, and Product Details page with dynamic variant selection).
 - **Day 16:** Shopping Cart implementation (Redux Global State, slide-over Cart panel, and live Subtotal calculations).
-- **Day 17:** Stripe Integration (Installed Stripe Node SDK, built `/api/payments/create-intent` endpoint to securely calculate totals and generate Stripe client secrets).
+- **Day 17:** Stripe Integration (Installed Stripe Node SDK, built `/api/payments/create-intent` endpoint).
 - **Day 18:** Payment Verification & Webhooks (Built secure `/api/webhooks/stripe` endpoint using `express.raw()` to parse and cryptographically verify Stripe event signatures).
-- **Day 20:** Checkout Flow UI (Installed `@stripe/react-stripe-js`, built custom React checkout form that securely fetches client secrets and processes dummy card numbers).
-- **Day 21:** Order Confirmation Emails (Configured `@emailjs/nodejs` to automatically send email receipts via EmailJS inside the Stripe Webhook when a payment succeeds).
+- **Day 20:** Checkout Flow UI (Installed `@stripe/react-stripe-js`, built custom React checkout form and a dedicated Post-Checkout Order Success Screen).
+- **Day 21:** Automated order receipts and tracking (Transaction IDs integrated globally across Admin and Vendor tables).
 
-### Week 4 - Analytics, Refinement & Deployment
-- **Day 22:** Vendor Analytics (Updated Vendor Dashboard to display real-time Total Revenue and Order Count by querying the new `orders` table, and added a Recent Orders list).
+### Week 4 - Analytics, Refinement & Deployment (COMPLETED)
+- **Day 22:** Vendor Analytics (Updated Vendor Dashboard to display real-time Total Revenue and Order Count, and implemented Vendor Wallet / Payout Requests).
 - **Day 23:** Super Admin Analytics (Built `/api/admin/stats` and `AdminDashboard.jsx` to aggregate total platform metrics, exclusively accessible by users with the `SUPER_ADMIN` role).
-- **Day 24:** Chart Integration (Installed `recharts`, updated SQL queries to group revenue by date for the last 7 days, and rendered interactive Line and Bar charts in the Admin and Vendor dashboards).
-- **Day 25:** Role Security & Routing (Built a strict `RequireRole` React router component in `App.jsx` to physically prevent Customers from rendering Vendor or Admin UI layouts).
-- **Day 26:** Production Prep (Built `errorHandler.js` for clean Express API error logging, and wrote a `database_indexes.sql` script to create PostgreSQL indexes that massively speed up platform queries).
-- **Day 27:** CI/CD & Build Configuration (Added Node `start` scripts, Vercel SPA `rewrites` configuration, and compiled a comprehensive Deployment Checklist artifact).
-- **Day 28:** Final Polish & UI Upgrade (Built fully automated `BecomeVendor` onboarding flow, redesigned Homepage/Storefront/Checkout with premium UI/UX, and finalized project for production deployment on Render and Vercel).
+- **Day 24:** Chart Integration (Installed `recharts`, updated SQL queries to render interactive Line and Bar charts in Admin and Vendor dashboards).
+- **Day 25:** Role Security & Routing (Strict `RequireRole` React router component, plus Admin UI lockout blocking Super Admins from checking out as customers).
+- **Day 26:** Production Prep (Built `errorHandler.js` for clean Express API error logging, and wrote a `database_indexes.sql` script to speed up platform queries).
+- **Day 27:** CI/CD & Build Configuration (Added Node `start` scripts, Vercel SPA `rewrites` configuration).
+- **Day 28:** Final Polish (Built fully automated `BecomeVendor` onboarding flow, redesigned Homepage/Storefront/Checkout with premium UI/UX, implemented Admin Global Catalog image viewer, and finalized project for production deployment on Render and Vercel).
