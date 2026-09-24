@@ -1,18 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const { createPaymentIntent, confirmPayment } = require('../controllers/paymentController');
-const { getAuth } = require('@clerk/express');
+const { requireRole } = require('../middleware/roleMiddleware');
+const { ROLES } = require('../utils/constants');
 
-// Middleware to verify user is authenticated for checkout
-const requireAuth = (req, res, next) => {
-  const { userId } = getAuth(req);
-  if (!userId) {
-    return res.status(401).json({ error: 'You must be logged in to checkout' });
-  }
-  next();
-};
+// Middleware to verify user is authenticated and NOT a super admin
+const requireShopper = requireRole([ROLES.CUSTOMER, ROLES.VENDOR]);
 
-router.post('/create-intent', requireAuth, createPaymentIntent);
-router.post('/confirm', requireAuth, confirmPayment);
+router.post('/create-intent', requireShopper, createPaymentIntent);
+router.post('/confirm', requireShopper, confirmPayment);
 
 module.exports = router;
