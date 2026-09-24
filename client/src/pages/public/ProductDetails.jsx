@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart, openCart } from '../../redux/slices/cartSlice';
 
 const ProductDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
+  const dbUser = useSelector(state => state.auth.user);
+  const isAdmin = dbUser?.role === 'SUPER_ADMIN';
+  
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -121,14 +124,17 @@ const ProductDetails = () => {
             <p className="text-sm text-gray-500">{displayStock} in stock</p>
           </div>
 
-          <div className="mt-8 flex">
+          <div className="mt-8 flex flex-col space-y-4">
             <button
               onClick={handleAddToCart}
-              disabled={displayStock <= 0}
+              disabled={displayStock <= 0 || isAdmin}
               className="max-w-xs flex-1 bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-gray-50 sm:w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Add to Cart
+              {isAdmin ? 'Admin Cannot Purchase' : 'Add to Cart'}
             </button>
+            {isAdmin && (
+              <p className="text-sm text-red-500 font-medium">Super Admins are restricted to read-only supervision.</p>
+            )}
           </div>
         </div>
       </div>
