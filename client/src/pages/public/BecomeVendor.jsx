@@ -69,12 +69,12 @@ const BecomeVendor = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto text-center">
-        <h2 className="text-base font-semibold text-indigo-600 tracking-wide uppercase">Partner with Zaalima</h2>
+        <h2 className="text-base font-semibold text-indigo-600 tracking-wide uppercase">Partner with EComVerse</h2>
         <p className="mt-2 text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
           Sell your shoes to the world.
         </p>
         <p className="max-w-xl mt-5 mx-auto text-xl text-gray-500">
-          Join thousands of independent sellers and brands managing their stores on Zaalima's multi-tenant e-commerce platform.
+          Join thousands of independent sellers and brands managing their stores on EComVerse's multi-tenant e-commerce platform.
         </p>
       </div>
 

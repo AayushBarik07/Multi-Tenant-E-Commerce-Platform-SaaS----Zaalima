@@ -180,7 +180,7 @@ const getVendorOrders = async (req, res) => {
 
     // Fetch orders with customer details
     const ordersResult = await db.query(
-      `SELECT o.id, o.total_amount, o.order_status, o.created_at, u.name as customer_name, u.email as customer_email 
+      `SELECT o.id, o.total_amount, o.order_status, o.created_at, o.payment_reference, u.name as customer_name, u.email as customer_email 
        FROM orders o 
        JOIN users u ON o.customer_user_id = u.id 
        WHERE o.store_id = $1 AND o.payment_status = 'SUCCESS' 

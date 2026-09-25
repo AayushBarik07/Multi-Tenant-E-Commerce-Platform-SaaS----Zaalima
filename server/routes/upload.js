@@ -14,7 +14,7 @@ router.post('/', requireVendor, upload.single('image'), (req, res) => {
 
   // Use upload_stream to upload the buffer from memory to Cloudinary
   const uploadStream = cloudinary.uploader.upload_stream(
-    { folder: 'zaalima' },
+    { folder: 'EComVerse' },
     (error, result) => {
       if (error) {
         console.error('Cloudinary upload error:', error);

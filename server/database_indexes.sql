@@ -1,5 +1,5 @@
 -- ==============================================================================
--- ZAALIMA E-COMMERCE PLATFORM
+-- EComVerse E-COMMERCE PLATFORM
 -- DATABASE INDEXES FOR PERFORMANCE OPTIMIZATION (DAY 26)
 -- ==============================================================================
 -- Run these commands in your Supabase SQL Editor to speed up database queries

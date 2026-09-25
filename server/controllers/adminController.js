@@ -27,7 +27,7 @@ const getPlatformStats = async (req, res) => {
 
     const recentStoresResult = await db.query('SELECT id, name, created_at FROM stores ORDER BY created_at DESC LIMIT 5');
     
-    const recentOrdersResult = await db.query(`SELECT o.id, o.total_amount, o.created_at, o.payment_status, u.email as customer_email, s.name as store_name FROM orders o JOIN users u ON o.customer_user_id = u.id JOIN stores s ON o.store_id = s.id ORDER BY o.created_at DESC LIMIT 10`);
+    const recentOrdersResult = await db.query(`SELECT o.id, o.total_amount, o.created_at, o.payment_status, o.payment_reference, u.email as customer_email, s.name as store_name FROM orders o JOIN users u ON o.customer_user_id = u.id JOIN stores s ON o.store_id = s.id ORDER BY o.created_at DESC LIMIT 10`);
     
     res.json({
       success: true,
@@ -66,7 +66,7 @@ const getStores = async (req, res) => {
 const getProducts = async (req, res) => {
   try {
     const result = await db.query(`
-      SELECT p.id, p.name, p.price, p.stock, p.status, p.created_at, s.name as store_name
+      SELECT p.id, p.name, p.price, p.stock, p.status, p.created_at, p.image_url, s.name as store_name
       FROM products p
       JOIN stores s ON p.store_id = s.id
       ORDER BY p.created_at DESC
@@ -80,7 +80,7 @@ const getProducts = async (req, res) => {
 const getOrders = async (req, res) => {
   try {
     const result = await db.query(`
-      SELECT o.id, o.total_amount, o.created_at, o.payment_status, u.email as customer_email, s.name as store_name
+      SELECT o.id, o.total_amount, o.created_at, o.payment_status, o.payment_reference, u.email as customer_email, s.name as store_name
       FROM orders o
       JOIN users u ON o.customer_user_id = u.id
       JOIN stores s ON o.store_id = s.id

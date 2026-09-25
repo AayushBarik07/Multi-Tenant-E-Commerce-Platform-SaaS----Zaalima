@@ -101,6 +101,7 @@ const ProductsList = () => {
               <tr className="bg-gray-50 border-b border-t">
                 <th className="p-4 font-medium text-gray-600">Image</th>
                 <th className="p-4 font-medium text-gray-600">Name</th>
+                <th className="p-4 font-medium text-gray-600">Category</th>
                 <th className="p-4 font-medium text-gray-600">Price</th>
                 <th className="p-4 font-medium text-gray-600">Stock</th>
                 <th className="p-4 font-medium text-gray-600">Status</th>
@@ -118,6 +119,13 @@ const ProductsList = () => {
                     )}
                   </td>
                   <td className="p-4 font-medium text-gray-800">{product.name}</td>
+                  <td className="p-4 text-gray-600 text-sm">
+                    {product.category ? (
+                      <span className="bg-gray-100 px-2 py-1 rounded">{product.category}</span>
+                    ) : (
+                      <span className="text-gray-400 italic">None</span>
+                    )}
+                  </td>
                   <td className="p-4">${parseFloat(product.price).toFixed(2)}</td>
                   <td className="p-4">{product.stock}</td>
                   <td className="p-4">

@@ -20,7 +20,7 @@ app.use(clerkMiddleware());
 
 // Public Route
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Zaalima API is running' });
+  res.json({ status: 'OK', message: 'EComVerse API is running' });
 });
 
 const { errorHandler, notFound } = require('./middleware/errorHandler');
@@ -32,6 +32,7 @@ app.use('/api/upload', require('./routes/upload'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/brands', require('./routes/brands'));
 app.use('/api/payments', require('./routes/payments'));
+app.use('/api/orders', require('./routes/orders'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/payouts', require('./routes/payouts'));
 

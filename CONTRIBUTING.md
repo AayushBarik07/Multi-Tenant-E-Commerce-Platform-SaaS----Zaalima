@@ -1,6 +1,6 @@
 # Contributing Guidelines
 
-We welcome contributions to the Zaalima Multi-Tenant E-Commerce Platform!
+We welcome contributions to the EComVerse Multi-Tenant E-Commerce Platform!
 
 ## Pull Request Process
 1. Ensure any install or build dependencies are removed before the end of the layer when doing a build.

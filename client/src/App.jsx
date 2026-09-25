@@ -13,6 +13,7 @@ import Storefront from './pages/public/Storefront';
 import ProductDetails from './pages/public/ProductDetails';
 import Checkout from './pages/public/Checkout';
 import Success from './pages/public/Success';
+import CustomerOrders from './pages/customer/CustomerOrders';
 import BecomeVendor from './pages/public/BecomeVendor';
 import CartDrawer from './components/public/CartDrawer';
 import Footer from './components/Footer';
@@ -80,13 +81,7 @@ function RoleDashboard() {
       return <Navigate to="/vendor" />;
     case 'CUSTOMER':
     default:
-      return (
-        <div className="p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Customer Dashboard</h2>
-          <p className="text-gray-600 mb-4">Welcome back to EComVerse!</p>
-          <Link to="/" className="text-indigo-600 hover:underline">Start Shopping</Link>
-        </div>
-      );
+      return <CustomerOrders />;
   }
 }
 

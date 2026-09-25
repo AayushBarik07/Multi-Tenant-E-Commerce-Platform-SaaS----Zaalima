@@ -1,4 +1,4 @@
--- Zaalima Project 1 Database Schema
+-- EComVerse Project 1 Database Schema
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
