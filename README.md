@@ -1,4 +1,4 @@
-# EComVerse Multi-Tenant E-Commerce SaaS Platform
+# EComVerse Multi-Tenant E-Commerce SaaS Platform\n\n🌍 **Live Demo:** [Visit EComVerse](https://your-vercel-link-here.vercel.app) \n*(Note: Replace with your actual Vercel link!)*
 
 A comprehensive multi-vendor e-commerce platform designed to allow independent vendors to open stores, manage inventory, and process orders, while providing customers with a seamless, global shopping experience. 
 
@@ -103,4 +103,4 @@ We have recently shipped several major improvements to the platform:
 - **Day 25:** Role Security & Routing (Strict `RequireRole` React router component, plus Admin UI lockout blocking Super Admins from checking out as customers).
 - **Day 26:** Production Prep (Built `errorHandler.js` for clean Express API error logging, and wrote a `database_indexes.sql` script to speed up platform queries).
 - **Day 27:** CI/CD & Build Configuration (Added Node `start` scripts, Vercel SPA `rewrites` configuration).
-- **Day 28:** Final Polish (Built fully automated `BecomeVendor` onboarding flow, redesigned Homepage/Storefront/Checkout with premium UI/UX, implemented Admin Global Catalog image viewer, and finalized project for production deployment on Render and Vercel).
+- **Day 28:** Final Polish & Live Deployment (Successfully deployed the full platform architecture to production using Vercel for the frontend and Render for the Node.js backend).
