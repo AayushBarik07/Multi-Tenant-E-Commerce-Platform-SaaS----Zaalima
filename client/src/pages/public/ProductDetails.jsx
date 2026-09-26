@@ -55,7 +55,7 @@ const ProductDetails = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div className="mb-6">
-        <Link to={`/store/${product.store_id}`} className="text-indigo-600 hover:underline font-medium">
+        <Link to={`/store/${product.store_id}`} className="text-[#FF5A24] hover:underline font-medium">
           &larr; Back to Store
         </Link>
       </div>
@@ -107,10 +107,10 @@ const ProductDetails = () => {
                     className={`
                       border rounded-md py-3 px-3 flex items-center justify-center text-sm font-medium uppercase sm:flex-1
                       ${selectedVariant?.id === variant.id 
-                        ? 'bg-indigo-600 border-transparent text-white hover:bg-indigo-700' 
+                        ? 'bg-[#FF5A24] border-transparent text-white hover:bg-[#E5481B]' 
                         : 'bg-white border-gray-200 text-gray-900 hover:bg-gray-50'
                       }
-                      ${variant.stock <= 0 ? 'opacity-25 cursor-not-allowed' : 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500'}
+                      ${variant.stock <= 0 ? 'opacity-25 cursor-not-allowed' : 'cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF5A24]'}
                     `}
                   >
                     {variant.name}
@@ -128,7 +128,7 @@ const ProductDetails = () => {
             <button
               onClick={handleAddToCart}
               disabled={displayStock <= 0 || isAdmin}
-              className="max-w-xs flex-1 bg-indigo-600 border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-gray-50 sm:w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              className="max-w-xs flex-1 bg-[#FF5A24] border border-transparent rounded-md py-3 px-8 flex items-center justify-center text-base font-medium text-white hover:bg-[#E5481B] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF5A24] focus:ring-offset-gray-50 sm:w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isAdmin ? 'Admin Cannot Purchase' : 'Add to Cart'}
             </button>

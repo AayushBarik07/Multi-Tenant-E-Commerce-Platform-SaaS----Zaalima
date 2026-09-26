@@ -17,6 +17,7 @@ import CustomerOrders from './pages/customer/CustomerOrders';
 import BecomeVendor from './pages/public/BecomeVendor';
 import CartDrawer from './components/public/CartDrawer';
 import Footer from './components/Footer';
+import Header from './components/Header';
 import { toggleCart } from './redux/slices/cartSlice';
 import AdminLayout from './components/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -114,61 +115,7 @@ function App() {
     <Router>
       <SyncUser>
         <div className="min-h-screen bg-gray-50 flex flex-col">
-          {/* Basic Header */}
-          <header className="bg-white shadow-sm p-4 flex justify-between items-center relative z-10">
-            <Link to="/" className="text-xl font-bold text-indigo-600 hover:text-indigo-700">EComVerse</Link>
-            <nav className="flex items-center space-x-6">
-              {/* Become a Vendor Link (Only for Customers or logged out users) */}
-              {(!dbUser || dbUser.role === 'CUSTOMER') && (
-                <Link to="/become-vendor" className="text-gray-600 hover:text-indigo-600 font-medium text-sm">
-                  Sell on EComVerse
-                </Link>
-              )}
-
-              {/* Hide Cart for Super Admins */}
-              {(!dbUser || dbUser.role !== 'SUPER_ADMIN') && (
-                <button 
-                  onClick={() => dispatch(toggleCart())}
-                  className="text-gray-600 hover:text-gray-900 relative"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                  {cartItemsCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                      {cartItemsCount}
-                    </span>
-                  )}
-                </button>
-              )}
-              
-              <SignedIn>
-                <div className="flex items-center space-x-4 border-l border-gray-200 pl-4 ml-2">
-                  {dbUser && (
-                    <span className={`hidden sm:inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide border ${
-                      dbUser.role === 'SUPER_ADMIN' 
-                        ? 'bg-purple-50 text-purple-700 border-purple-200' 
-                        : dbUser.role === 'VENDOR'
-                        ? 'bg-indigo-50 text-indigo-700 border-indigo-200'
-                        : 'bg-gray-50 text-gray-500 border-gray-200'
-                    }`}>
-                      {dbUser.role === 'SUPER_ADMIN' ? 'Admin Account' : dbUser.role === 'VENDOR' ? 'Vendor Account' : 'Customer Account'}
-                    </span>
-                  )}
-                  <Link to="/dashboard" className="font-medium text-gray-700 hover:text-indigo-600 text-sm">Dashboard</Link>
-                  <UserButton />
-                </div>
-              </SignedIn>
-              <SignedOut>
-                <SignInButton mode="modal" fallbackRedirectUrl="/">
-                  <button className="text-indigo-600 font-medium hover:underline mr-4">Sign In</button>
-                </SignInButton>
-                <SignUpButton mode="modal" fallbackRedirectUrl="/">
-                  <button className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700">Sign Up</button>
-                </SignUpButton>
-              </SignedOut>
-            </nav>
-          </header>
+          <Header />
 
           <CartDrawer />
 

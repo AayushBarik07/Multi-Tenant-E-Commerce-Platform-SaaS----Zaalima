@@ -1,29 +1,11 @@
-import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import ProductCard from '../../components/ProductCard';
+const fs = require('fs');
+let c = fs.readFileSync('client/src/pages/public/Home.jsx', 'utf8');
 
-const Home = () => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+// Replace the Categories, New Arrivals, and Best Sellers sections with a single "All Products" section.
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/products`);
-        const data = await res.json();
-        if (data.success) {
-          setProducts(data.products || []);
-        }
-      } catch (error) {
-        console.error('Failed to fetch products', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
+const oldMiddleSectionRegex = /\/\/ Extract unique categories[\s\S]*?\{\/\* Promo Banners \*\/\}/;
 
-  // Centralized Products Array
+const newMiddleSection = `// Centralized Products Array
   const allProducts = products;
 
   return (
@@ -141,51 +123,9 @@ const Home = () => {
         )}
       </div>
 
-      {/* Promo Banners */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 mb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Flash Sale Banner */}
-          <div className="bg-gradient-to-br from-[#FF6B35] to-[#FF3E00] rounded-3xl p-8 md:p-12 text-white relative overflow-hidden flex flex-col justify-center min-h-[300px]">
-            <div className="absolute right-[-10%] bottom-[-20%] w-64 md:w-96 opacity-90 mix-blend-overlay">
-              <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop" alt="Shoe" className="transform -rotate-12 scale-125" />
-            </div>
-            <div className="relative z-10 max-w-sm">
-              <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">Flash Sale</span>
-              <h2 className="text-4xl md:text-5xl font-black mt-4 mb-2 leading-tight">Up To 70% Off</h2>
-              
-              <div className="flex space-x-4 my-6">
-                <div className="text-center"><div className="text-2xl font-bold bg-white/20 rounded-lg w-12 h-12 flex items-center justify-center backdrop-blur-sm">02</div><div className="text-[10px] mt-1 opacity-80 uppercase">Days</div></div>
-                <div className="text-center"><div className="text-2xl font-bold bg-white/20 rounded-lg w-12 h-12 flex items-center justify-center backdrop-blur-sm">15</div><div className="text-[10px] mt-1 opacity-80 uppercase">Hours</div></div>
-                <div className="text-center"><div className="text-2xl font-bold bg-white/20 rounded-lg w-12 h-12 flex items-center justify-center backdrop-blur-sm">45</div><div className="text-[10px] mt-1 opacity-80 uppercase">Mins</div></div>
-                <div className="text-center"><div className="text-2xl font-bold bg-white/20 rounded-lg w-12 h-12 flex items-center justify-center backdrop-blur-sm">30</div><div className="text-[10px] mt-1 opacity-80 uppercase">Secs</div></div>
-              </div>
+      {/* Promo Banners */}`;
 
-              <button className="bg-white text-[#FF3E00] px-6 py-3 rounded-xl font-bold text-sm hover:bg-gray-100 transition-colors">
-                Shop Sale Now
-              </button>
-            </div>
-          </div>
+c = c.replace(oldMiddleSectionRegex, newMiddleSection);
 
-          {/* New Collection Banner */}
-          <div className="bg-[#111] rounded-3xl p-8 md:p-12 text-white relative overflow-hidden flex flex-col justify-center min-h-[300px]">
-            <div className="absolute right-[-5%] top-0 h-full w-1/2 opacity-70">
-              <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=800&auto=format&fit=crop" alt="Model" className="object-cover h-full w-full object-center mask-image-gradient" style={{ WebkitMaskImage: 'linear-gradient(to right, transparent, black)' }} />
-            </div>
-            <div className="relative z-10 max-w-xs">
-              <span className="text-gray-400 text-xs font-bold tracking-widest uppercase mb-2 block">New Collection</span>
-              <h2 className="text-3xl md:text-4xl font-black mb-4 leading-tight">Summer 2025</h2>
-              <p className="text-sm text-gray-400 mb-8">Discover the latest trends and fresh styles.</p>
-              
-              <button className="bg-white text-gray-900 px-6 py-3 rounded-xl font-bold text-sm hover:bg-gray-100 transition-colors">
-                Shop Collection
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  );
-};
-
-export default Home;
+fs.writeFileSync('client/src/pages/public/Home.jsx', c);
+console.log('Home.jsx reverted to centralized products layout.');
