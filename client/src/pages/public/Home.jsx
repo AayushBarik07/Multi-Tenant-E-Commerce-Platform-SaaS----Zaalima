@@ -40,10 +40,10 @@ const Home = () => {
               Shop the latest trending products curated for modern lifestyles.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <a href="#all-products" className="bg-[#FF5A24] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/30 flex items-center justify-center">
+              <a href="#all-products" className="cursor-pointer bg-[#FF5A24] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/30 flex items-center justify-center">
                 Shop Now <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
               </a>
-              <Link to="/become-vendor" className="bg-white text-gray-900 border border-gray-200 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors flex items-center justify-center">
+              <Link to="/become-vendor" className="cursor-pointer bg-white text-gray-900 border border-gray-200 px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-50 transition-colors flex items-center justify-center">
                 Become a Seller
               </Link>
             </div>
@@ -160,7 +160,7 @@ const Home = () => {
                 <div className="text-center"><div className="text-2xl font-bold bg-white/20 rounded-lg w-12 h-12 flex items-center justify-center backdrop-blur-sm">30</div><div className="text-[10px] mt-1 opacity-80 uppercase">Secs</div></div>
               </div>
 
-              <button className="bg-white text-[#FF3E00] px-6 py-3 rounded-xl font-bold text-sm hover:bg-gray-100 transition-colors">
+              <button className="cursor-pointer bg-white text-[#FF3E00] px-6 py-3 rounded-xl font-bold text-sm hover:bg-gray-100 transition-colors">
                 Shop Sale Now
               </button>
             </div>
@@ -176,7 +176,7 @@ const Home = () => {
               <h2 className="text-3xl md:text-4xl font-black mb-4 leading-tight">Summer 2025</h2>
               <p className="text-sm text-gray-400 mb-8">Discover the latest trends and fresh styles.</p>
               
-              <button className="bg-white text-gray-900 px-6 py-3 rounded-xl font-bold text-sm hover:bg-gray-100 transition-colors">
+              <button className="cursor-pointer bg-white text-gray-900 px-6 py-3 rounded-xl font-bold text-sm hover:bg-gray-100 transition-colors">
                 Shop Collection
               </button>
             </div>

@@ -8,6 +8,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const dbUser = useSelector(state => state.auth.user);
   const cartItemsCount = useSelector(state => state.cart.items.reduce((acc, item) => acc + item.quantity, 0));
+  const isStaff = dbUser && (dbUser.role === 'SUPER_ADMIN' || dbUser.role === 'VENDOR');
 
   // Hide the header on Admin and Vendor routes
   if (location.pathname.startsWith('/admin') || location.pathname.startsWith('/vendor')) {
@@ -35,32 +36,32 @@ const Header = () => {
       {/* Premium Navbar */}
       <header className="bg-white border-b border-gray-100 py-4 px-6 md:px-12 flex justify-between items-center sticky top-0 z-50 shadow-sm transition-all duration-300">
         {/* Logo */}
-        <Link to="/" className="text-2xl font-black text-gray-900 tracking-tighter">
+        <Link to="/" className="cursor-pointer text-2xl font-black text-gray-900 tracking-tighter">
           ECom<span className="text-[#FF5A24]">Verse</span>
         </Link>
 
         {/* Center Navigation */}
         <nav className="hidden lg:flex items-center space-x-8 font-medium text-sm text-gray-700">
-          <Link to="/" className="text-[#FF5A24] border-b-2 border-[#FF5A24] pb-1">Home</Link>
-          <Link to="/" className="hover:text-[#FF5A24] transition-colors pb-1">Shop</Link>
-          <Link to="/" className="hover:text-[#FF5A24] transition-colors pb-1">New Arrivals</Link>
-          <Link to="/" className="hover:text-[#FF5A24] transition-colors pb-1">Best Sellers</Link>
+          <Link to="/" className="cursor-pointer text-[#FF5A24] border-b-2 border-[#FF5A24] pb-1">Home</Link>
+          <Link to="/" className="cursor-pointer hover:text-[#FF5A24] transition-colors pb-1">Shop</Link>
+          <Link to="/" className="cursor-pointer hover:text-[#FF5A24] transition-colors pb-1">New Arrivals</Link>
+          <Link to="/" className="cursor-pointer hover:text-[#FF5A24] transition-colors pb-1">Best Sellers</Link>
           {(!dbUser || dbUser.role === 'CUSTOMER') && (
-            <Link to="/become-vendor" className="hover:text-[#FF5A24] transition-colors pb-1">Sell with us</Link>
+            <Link to="/become-vendor" className="cursor-pointer hover:text-[#FF5A24] transition-colors pb-1">Sell with us</Link>
           )}
         </nav>
 
         {/* Right Icons & Auth */}
         <div className="flex items-center space-x-5">
           {/* Search Icon */}
-          <button className="text-gray-800 hover:text-[#FF5A24] transition-colors">
+          <button className="cursor-pointer text-gray-800 hover:text-[#FF5A24] transition-colors">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
           </button>
           
           {/* Wishlist Icon */}
-          <button className="text-gray-800 hover:text-[#FF5A24] transition-colors hidden sm:block">
+          <Link to="/wishlist" className="cursor-pointer text-gray-800 hover:text-[#FF5A24] transition-colors hidden sm:block">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-          </button>
+          </Link>
 
           {/* Hide Cart for Super Admins */}
           {(!dbUser || dbUser.role !== 'SUPER_ADMIN') && (
@@ -82,7 +83,12 @@ const Header = () => {
           {/* Auth Logic */}
           <div className="flex items-center border-l border-gray-200 pl-5 ml-2 space-x-4">
             <SignedIn>
-              <Link to="/dashboard" className="hidden md:inline-flex items-center text-sm font-semibold text-gray-700 hover:text-[#FF5A24]">
+              {dbUser && (
+                <span className={`hidden sm:inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${dbUser.role === 'SUPER_ADMIN' ? 'bg-purple-100 text-purple-800 border-purple-200' : dbUser.role === 'VENDOR' ? 'bg-blue-100 text-blue-800 border-blue-200' : 'bg-gray-100 text-gray-800 border-gray-200'}`}>
+                  {dbUser.role === 'SUPER_ADMIN' ? 'ADMIN' : dbUser.role}
+                </span>
+              )}
+              <Link to="/dashboard" className="cursor-pointer hidden md:inline-flex items-center text-sm font-semibold text-gray-700 hover:text-[#FF5A24]">
                 Dashboard
               </Link>
               <div className="border-2 border-transparent hover:border-[#FF5A24] rounded-full transition-all">
@@ -91,10 +97,10 @@ const Header = () => {
             </SignedIn>
             <SignedOut>
               <SignInButton mode="modal" fallbackRedirectUrl="/">
-                <button className="text-gray-700 font-medium hover:text-[#FF5A24] text-sm">Sign In</button>
+                <button className="cursor-pointer text-gray-700 font-medium hover:text-[#FF5A24] text-sm">Sign In</button>
               </SignInButton>
               <SignUpButton mode="modal" fallbackRedirectUrl="/">
-                <button className="bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-[#FF5A24] transition-colors hidden sm:block">Sign Up</button>
+                <button className="cursor-pointer bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-[#FF5A24] transition-colors hidden sm:block">Sign Up</button>
               </SignUpButton>
             </SignedOut>
           </div>

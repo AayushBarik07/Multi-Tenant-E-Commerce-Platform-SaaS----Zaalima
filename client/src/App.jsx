@@ -14,6 +14,7 @@ import ProductDetails from './pages/public/ProductDetails';
 import Checkout from './pages/public/Checkout';
 import Success from './pages/public/Success';
 import CustomerOrders from './pages/customer/CustomerOrders';
+import Wishlist from './pages/customer/Wishlist';
 import BecomeVendor from './pages/public/BecomeVendor';
 import CartDrawer from './components/public/CartDrawer';
 import Footer from './components/Footer';
@@ -126,6 +127,7 @@ function App() {
               <Route path="/store/:storeId" element={<Storefront />} />
               <Route path="/product/:id" element={<ProductDetails />} />
               <Route path="/become-vendor" element={<BecomeVendor />} />
+                <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/success/:transactionId" element={<Success />} />
                 <Route path="/checkout" element={
                 <SignedIn>
