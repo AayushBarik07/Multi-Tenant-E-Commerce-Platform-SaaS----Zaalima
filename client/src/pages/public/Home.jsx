@@ -63,13 +63,13 @@ const Home = () => {
             <div className="absolute top-12 left-12 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl z-20 flex flex-col items-center animate-bounce" style={{animationDuration: '3s'}}>
               <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=100&h=100&fit=crop" className="w-16 h-16 object-cover rounded-lg mb-2" alt="Shoe" />
               <p className="text-[10px] font-bold text-gray-900">Air Max 270</p>
-              <p className="text-[10px] text-gray-500">$129.99</p>
+              <p className="text-[10px] text-gray-500">₹129.99</p>
             </div>
 
             <div className="absolute bottom-20 right-12 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-xl z-20 flex flex-col items-center animate-bounce" style={{animationDuration: '4s', animationDelay: '1s'}}>
               <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100&h=100&fit=crop" className="w-16 h-16 object-cover rounded-lg mb-2" alt="Headphones" />
               <p className="text-[10px] font-bold text-gray-900">Headphones</p>
-              <p className="text-[10px] text-gray-500">$99.99</p>
+              <p className="text-[10px] text-gray-500">₹99.99</p>
             </div>
           </div>
         </div>
@@ -83,7 +83,7 @@ const Home = () => {
               <svg className="w-8 h-8 text-gray-900 mb-3 md:mb-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
               <div>
                 <h4 className="font-bold text-gray-900">Free Shipping</h4>
-                <p className="text-sm text-gray-500">On orders over $50</p>
+                <p className="text-sm text-gray-500">On orders over ₹50</p>
               </div>
             </div>
             <div className="flex flex-col md:flex-row items-center md:items-start md:space-x-4">

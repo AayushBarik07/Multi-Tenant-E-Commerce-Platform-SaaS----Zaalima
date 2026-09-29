@@ -131,7 +131,7 @@ const VendorOrders = () => {
                           {order.customer_email}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm font-bold text-emerald-600">
-                          ${parseFloat(order.total_amount).toFixed(2)}
+                          ₹{parseFloat(order.total_amount).toFixed(2)}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm">
                             <select

@@ -1,14 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const { requireVendor, requireSuperAdmin } = require('../middleware/roleMiddleware');
-const { getVendorWallet, requestPayout, getAdminPayouts, updatePayoutStatus } = require('../controllers/payoutController');
+const { requireRole } = require('../middleware/roleMiddleware');
+const { ROLES } = require('../utils/constants');
+const { requestPayout, getPayouts, updatePayoutStatus, getWallet } = require('../controllers/payoutController');
 
 // Vendor routes
-router.get('/wallet', requireVendor, getVendorWallet);
-router.post('/request', requireVendor, requestPayout);
+router.get('/wallet', requireRole([ROLES.VENDOR]), getWallet);
+router.post('/request', requireRole([ROLES.VENDOR]), requestPayout);
 
-// Admin routes
-router.get('/admin', requireSuperAdmin, getAdminPayouts);
-router.patch('/admin/:id', requireSuperAdmin, updatePayoutStatus);
+// Vendor & Admin route
+router.get('/', requireRole([ROLES.VENDOR, ROLES.SUPER_ADMIN]), getPayouts);
+
+// Admin route
+router.put('/:id/status', requireRole([ROLES.SUPER_ADMIN]), updatePayoutStatus);
 
 module.exports = router;

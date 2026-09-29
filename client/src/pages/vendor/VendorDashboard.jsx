@@ -59,7 +59,7 @@ const VendorDashboard = () => {
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-gray-500 text-sm font-medium">Revenue</h3>
-          <p className="text-3xl font-bold text-gray-900 mt-2">${stats.revenue.toFixed(2)}</p>
+          <p className="text-3xl font-bold text-gray-900 mt-2">₹{stats.revenue.toFixed(2)}</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <h3 className="text-gray-500 text-sm font-medium">Active Products</h3>
@@ -77,11 +77,11 @@ const VendorDashboard = () => {
                 <BarChart data={stats.revenueChartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
                   <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} tickFormatter={(val) => `$${val}`} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#6B7280' }} tickFormatter={(val) => `₹${val}`} />
                   <Tooltip 
                     cursor={{ fill: '#F3F4F6' }}
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                    formatter={(value) => [`$${value}`, 'Revenue']}
+                    formatter={(value) => [`₹${value}`, 'Revenue']}
                   />
                   <Bar dataKey="revenue" fill="#4F46E5" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -108,7 +108,7 @@ const VendorDashboard = () => {
                         <p className="text-xs text-gray-500">{order.customer_email}</p>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold text-gray-900">${parseFloat(order.total_amount).toFixed(2)}</p>
+                        <p className="text-sm font-bold text-gray-900">₹{parseFloat(order.total_amount).toFixed(2)}</p>
                         <p className="text-xs text-gray-500">{new Date(order.created_at).toLocaleDateString()}</p>
                       </div>
                     </div>

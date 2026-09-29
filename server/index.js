@@ -36,6 +36,7 @@ app.use('/api/orders', require('./routes/orders'));
 app.use('/api/wishlist', require('./routes/wishlist'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/payouts', require('./routes/payouts'));
+app.use('/api/reports', require('./routes/reports'));
 
 // Fallback for 404 Not Found
 app.use(notFound);

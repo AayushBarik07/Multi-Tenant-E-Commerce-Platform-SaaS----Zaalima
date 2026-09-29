@@ -15,6 +15,30 @@ const AdminDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
 
+  
+  const handleDownloadReport = async () => {
+    try {
+      const token = await getToken();
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/reports/admin`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Failed to download');
+      
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'EComVerse_Global_Report.xlsx';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Download error:', err);
+      alert('Failed to download report.');
+    }
+  };
+  
   useEffect(() => {
     const fetchAdminStats = async () => {
       try {
@@ -45,9 +69,18 @@ const AdminDashboard = () => {
 
   return (
     <div className="text-slate-100">
-      <h2 className="text-3xl font-extrabold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">
-        Super Admin Command Center
-      </h2>
+      <div className="flex justify-between items-start mb-8">
+        <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">
+          Super Admin Command Center
+        </h2>
+        <button
+          onClick={handleDownloadReport}
+          className="cursor-pointer inline-flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors shadow-[0_0_15px_rgba(168,85,247,0.4)]"
+        >
+          <svg className="-ml-1 mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+          Download Global Excel Report
+        </button>
+      </div>
       
       {/* Top Stats Cards - Dark Glassmorphism */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
@@ -57,7 +90,7 @@ const AdminDashboard = () => {
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             Platform Revenue
           </h3>
-          <p className="text-4xl font-black text-white mt-3">${stats.platformRevenue.toFixed(2)}</p>
+          <p className="text-4xl font-black text-white mt-3">₹{stats.platformRevenue.toFixed(2)}</p>
         </div>
         <div className="bg-slate-800/50 backdrop-blur border border-slate-700/50 p-6 rounded-2xl shadow-lg relative overflow-hidden group">
           <div className="absolute -right-6 -top-6 bg-emerald-500/10 w-24 h-24 rounded-full group-hover:bg-emerald-500/20 transition-all"></div>
@@ -89,11 +122,11 @@ const AdminDashboard = () => {
                 <LineChart data={stats.revenueChartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" />
                   <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} dy={10} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} tickFormatter={(val) => `$${val}`} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94a3b8' }} tickFormatter={(val) => `₹${val}`} />
                   <Tooltip 
                     contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', color: '#f1f5f9', borderRadius: '8px' }}
                     itemStyle={{ color: '#c084fc' }}
-                    formatter={(value) => [`$${value}`, 'Revenue']}
+                    formatter={(value) => [`₹${value}`, 'Revenue']}
                   />
                   <Line type="monotone" dataKey="revenue" stroke="#a855f7" strokeWidth={4} dot={{ r: 4, fill: '#a855f7', strokeWidth: 2, stroke: '#1e293b' }} activeDot={{ r: 8, fill: '#c084fc' }} />
                 </LineChart>
@@ -158,7 +191,7 @@ const AdminDashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">{new Date(order.created_at).toLocaleString()}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">{order.customer_email}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300 font-semibold">{order.store_name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-400 font-bold">${parseFloat(order.total_amount).toFixed(2)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-400 font-bold">₹{parseFloat(order.total_amount).toFixed(2)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         order.payment_status === 'SUCCESS' ? 'bg-emerald-100/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-100/10 text-amber-400 border border-amber-500/20'

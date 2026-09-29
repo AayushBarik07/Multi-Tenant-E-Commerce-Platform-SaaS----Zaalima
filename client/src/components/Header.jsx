@@ -21,7 +21,7 @@ const Header = () => {
       <div className="bg-[#111111] text-white text-xs font-medium py-2 px-4 flex justify-between items-center hidden sm:flex">
         <div className="flex items-center space-x-2">
           <svg className="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
-          <span>Free Worldwide Shipping Over $50</span>
+          <span>Free Worldwide Shipping Over ₹50</span>
         </div>
         <div className="flex space-x-6 text-gray-300">
           <span className="cursor-pointer hover:text-white transition-colors">Summer Sale Up To 70% Off</span>

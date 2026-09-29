@@ -54,7 +54,7 @@ const AdminStores = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-200 font-semibold">{store.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">{store.owner_email}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-indigo-400 font-bold">{store.product_count}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-400 font-bold">${parseFloat(store.total_revenue).toFixed(2)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-400 font-bold">₹{parseFloat(store.total_revenue).toFixed(2)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">{new Date(store.created_at).toLocaleDateString()}</td>
                   </tr>
                 ))

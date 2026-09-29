@@ -23,6 +23,7 @@ const requireRole = (allowedRoles) => {
       next();
     } catch (error) {
       console.error('Role middleware error:', error);
+      require('fs').appendFileSync('role_error.log', new Date().toISOString() + ' ' + error.stack + '\n');
       res.status(500).json({ error: 'Internal Server Error' });
     }
   };

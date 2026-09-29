@@ -84,7 +84,7 @@ const AdminOrders = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">{new Date(order.created_at).toLocaleString()}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">{order.customer_email}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300 font-semibold">{order.store_name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-400 font-bold">${parseFloat(order.total_amount).toFixed(2)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-400 font-bold">₹{parseFloat(order.total_amount).toFixed(2)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         order.payment_status === 'SUCCESS' ? 'bg-emerald-100/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-100/10 text-amber-400 border border-amber-500/20'

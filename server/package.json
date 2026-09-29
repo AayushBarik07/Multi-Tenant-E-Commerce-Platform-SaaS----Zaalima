@@ -25,7 +25,8 @@
     "pg": "^8.23.0",
     "streamifier": "^0.1.1",
     "stripe": "^14.19.0",
-    "supabase-js": "^0.0.1-security"
+    "supabase-js": "^0.0.1-security",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

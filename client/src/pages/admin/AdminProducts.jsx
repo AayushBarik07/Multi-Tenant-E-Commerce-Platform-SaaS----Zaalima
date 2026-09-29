@@ -55,7 +55,7 @@ const AdminProducts = () => {
                   <tr key={product.id} className="hover:bg-slate-800/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-200 font-semibold">{product.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-indigo-400">{product.store_name}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-400 font-bold">${parseFloat(product.price).toFixed(2)}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-emerald-400 font-bold">₹{parseFloat(product.price).toFixed(2)}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">{product.stock}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${product.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-500/10 text-slate-400 border border-slate-500/20'}`}>

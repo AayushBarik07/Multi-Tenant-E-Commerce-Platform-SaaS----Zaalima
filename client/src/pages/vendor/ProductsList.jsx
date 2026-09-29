@@ -126,7 +126,7 @@ const ProductsList = () => {
                       <span className="text-gray-400 italic">None</span>
                     )}
                   </td>
-                  <td className="p-4">${parseFloat(product.price).toFixed(2)}</td>
+                  <td className="p-4">₹{parseFloat(product.price).toFixed(2)}</td>
                   <td className="p-4">{product.stock}</td>
                   <td className="p-4">
                     <span className={`px-2 py-1 text-xs rounded-full ${

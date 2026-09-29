@@ -102,9 +102,9 @@ const ProductCard = ({ product }) => {
             </div>
             
             <div className="flex items-center space-x-2">
-              <span className="text-lg font-bold text-gray-900">${parseFloat(product.price).toFixed(2)}</span>
+              <span className="text-lg font-bold text-gray-900">₹{parseFloat(product.price).toFixed(2)}</span>
               {product.price > 50 && (
-                <span className="text-xs text-gray-400 line-through">${(parseFloat(product.price) * (1 + (discount/100))).toFixed(2)}</span>
+                <span className="text-xs text-gray-400 line-through">₹{(parseFloat(product.price) * (1 + (discount/100))).toFixed(2)}</span>
               )}
             </div>
           </div>

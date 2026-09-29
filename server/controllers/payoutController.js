@@ -1,162 +1,162 @@
 const db = require('../utils/db');
 const { getAuth } = require('@clerk/express');
 
-// Platform commission rate (e.g., 5%)
-const COMMISSION_RATE = 0.05;
-
-// Helper to get store ID from auth
-const getVendorStoreId = async (req) => {
+// @desc    Request a payout
+// @route   POST /api/payouts/request
+const requestPayout = async (req, res) => {
   const { userId } = getAuth(req);
-  if (!userId) return null;
-  const userResult = await db.query('SELECT id FROM users WHERE clerk_user_id = $1', [userId]);
-  if (userResult.rows.length === 0) return null;
-  const ownerUserId = userResult.rows[0].id;
-  const storeResult = await db.query('SELECT id FROM stores WHERE owner_user_id = $1', [ownerUserId]);
-  if (storeResult.rows.length === 0) return null;
-  return storeResult.rows[0].id;
+  const { amount } = req.body;
+
+  if (!amount || amount < 100) {
+    return res.status(400).json({ error: 'Minimum payout request is ₹100' });
+  }
+
+  try {
+    const userResult = await db.query('SELECT id FROM users WHERE clerk_user_id = $1', [userId]);
+    if (userResult.rows.length === 0) return res.status(401).json({ error: 'Unauthorized' });
+    const dbUserId = userResult.rows[0].id;
+
+    // Optional: check if vendor has enough balance here. Assuming we just log the request.
+    
+    const result = await db.query(
+      'INSERT INTO payouts (vendor_id, amount) VALUES ($1, $2) RETURNING *',
+      [dbUserId, amount]
+    );
+
+    res.json({ success: true, payout: result.rows[0] });
+  } catch (error) {
+    console.error('Error requesting payout:', error);
+    res.status(500).json({ error: 'Server error requesting payout' });
+  }
 };
 
-// @desc    Get vendor wallet details
-// @route   GET /api/payouts/wallet
-const getVendorWallet = async (req, res) => {
+// @desc    Get payouts (Vendor gets own, Admin gets all)
+// @route   GET /api/payouts
+const getPayouts = async (req, res) => {
+  const { userId } = getAuth(req);
+
   try {
-    const storeId = await getVendorStoreId(req);
-    if (!storeId) return res.status(404).json({ error: 'Store not found' });
+    const userResult = await db.query('SELECT id, role FROM users WHERE clerk_user_id = $1', [userId]);
+    if (userResult.rows.length === 0) return res.status(401).json({ error: 'Unauthorized' });
+    const user = userResult.rows[0];
 
-    // 1. Calculate Lifetime Sales
-    const salesResult = await db.query(
-      "SELECT COALESCE(SUM(total_amount), 0) as total_sales FROM orders WHERE store_id = $1 AND payment_status = 'SUCCESS'",
-      [storeId]
+    let query = '';
+    let params = [];
+
+    if (user.role === 'SUPER_ADMIN') {
+      // Admin sees all
+      query = `SELECT p.*, u.email as vendor_email, s.name as store_name
+               FROM payouts p
+               JOIN users u ON p.vendor_id = u.id
+               LEFT JOIN stores s ON s.owner_user_id = u.id
+               ORDER BY p.requested_at DESC`;
+    } else {
+      // Vendor sees their own
+      query = 'SELECT * FROM payouts WHERE vendor_id = $1 ORDER BY requested_at DESC';
+      params = [user.id];
+    }
+
+    const result = await db.query(query, params);
+    res.json({ success: true, payouts: result.rows });
+  } catch (error) {
+    console.error('Error fetching payouts:', error);
+    require('fs').appendFileSync('payout_error.log', new Date().toISOString() + ' ' + error.stack + '\n');
+    res.status(500).json({ error: 'Server error fetching payouts' });
+  }
+};
+
+// @desc    Update payout status (Admin only)
+// @route   PUT /api/payouts/:id/status
+const updatePayoutStatus = async (req, res) => {
+  const payoutId = req.params.id;
+  const { status } = req.body;
+
+  if (!['COMPLETED', 'REJECTED'].includes(status)) {
+    return res.status(400).json({ error: 'Invalid status' });
+  }
+
+  try {
+    const result = await db.query(
+      'UPDATE payouts SET status = $1, processed_at = CURRENT_TIMESTAMP WHERE id = $2 RETURNING *',
+      [status, payoutId]
     );
-    const totalSales = parseFloat(salesResult.rows[0].total_sales);
+
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Payout not found' });
     
-    // Vendor keeps 95%
-    const lifetimeEarnings = totalSales * (1 - COMMISSION_RATE);
+    res.json({ success: true, payout: result.rows[0] });
+  } catch (error) {
+    console.error('Error updating payout:', error);
+    res.status(500).json({ error: 'Server error updating payout' });
+  }
+};
 
-    // 2. Get Payout History
-    const historyResult = await db.query(
-      "SELECT id, amount, status, requested_at, paid_at FROM payout_requests WHERE store_id = $1 ORDER BY requested_at DESC",
-      [storeId]
-    );
-    const history = historyResult.rows;
 
-    // 3. Calculate Withdrawn and Pending
-    let totalWithdrawn = 0;
+
+// @desc    Get wallet stats for vendor
+// @route   GET /api/payouts/wallet
+const getWallet = async (req, res) => {
+  const { userId } = getAuth(req);
+
+  try {
+    const userResult = await db.query('SELECT id FROM users WHERE clerk_user_id = $1', [userId]);
+    if (userResult.rows.length === 0) return res.status(401).json({ error: 'Unauthorized' });
+    const dbUserId = userResult.rows[0].id;
+
+    // Get vendor's store
+    const storeResult = await db.query('SELECT id FROM stores WHERE owner_user_id = $1', [dbUserId]);
+    
+    let totalSales = 0;
+    
+    if (storeResult.rows.length > 0) {
+      const storeId = storeResult.rows[0].id;
+      
+      const salesQuery = `
+        SELECT COALESCE(SUM(oi.subtotal), 0) as total_sales
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.id
+        JOIN orders o ON oi.order_id = o.id
+        WHERE p.store_id = $1 AND o.payment_status = 'SUCCESS'
+      `;
+      const salesResult = await db.query(salesQuery, [storeId]);
+      totalSales = parseFloat(salesResult.rows[0].total_sales);
+    }
+
+    const commissionRate = 0.10;
+    const lifetimeEarnings = totalSales * (1 - commissionRate);
+
+    const payoutsQuery = 'SELECT COALESCE(SUM(amount), 0) as amount, status FROM payouts WHERE vendor_id = $1 GROUP BY status';
+    const payoutsResult = await db.query(payoutsQuery, [dbUserId]);
+    
     let totalPending = 0;
+    let totalCompleted = 0;
 
-    history.forEach(p => {
-      if (p.status === 'PAID') totalWithdrawn += parseFloat(p.amount);
-      if (p.status === 'PENDING') totalPending += parseFloat(p.amount);
+    payoutsResult.rows.forEach(row => {
+      if (row.status === 'PENDING') totalPending += parseFloat(row.amount);
+      if (row.status === 'COMPLETED') totalCompleted += parseFloat(row.amount);
     });
 
-    const availableBalance = lifetimeEarnings - totalWithdrawn - totalPending;
+    const availableBalance = lifetimeEarnings - totalPending - totalCompleted;
 
     res.json({
       success: true,
       wallet: {
         totalSales,
-        commissionRate: COMMISSION_RATE,
+        commissionRate,
         lifetimeEarnings,
-        totalWithdrawn,
         totalPending,
-        availableBalance,
-        history
+        totalCompleted,
+        availableBalance
       }
     });
   } catch (error) {
     console.error('Error fetching wallet:', error);
-    res.status(500).json({ error: 'Server error fetching wallet' });
-  }
-};
-
-// @desc    Request a new payout
-// @route   POST /api/payouts/request
-const requestPayout = async (req, res) => {
-  try {
-    const storeId = await getVendorStoreId(req);
-    if (!storeId) return res.status(404).json({ error: 'Store not found' });
-
-    const { amount } = req.body;
-    if (!amount || amount <= 0) {
-      return res.status(400).json({ error: 'Invalid payout amount' });
-    }
-
-    // Verify balance
-    const salesResult = await db.query("SELECT COALESCE(SUM(total_amount), 0) as total_sales FROM orders WHERE store_id = $1 AND payment_status = 'SUCCESS'", [storeId]);
-    const lifetimeEarnings = parseFloat(salesResult.rows[0].total_sales) * (1 - COMMISSION_RATE);
-    
-    const payoutSumResult = await db.query("SELECT COALESCE(SUM(amount), 0) as total_deducted FROM payout_requests WHERE store_id = $1 AND status IN ('PAID', 'PENDING')", [storeId]);
-    const totalDeducted = parseFloat(payoutSumResult.rows[0].total_deducted);
-
-    const availableBalance = lifetimeEarnings - totalDeducted;
-
-    if (amount > availableBalance) {
-      return res.status(400).json({ error: 'Insufficient funds' });
-    }
-
-    // Create request
-    const newRequest = await db.query(
-      "INSERT INTO payout_requests (store_id, amount, status) VALUES ($1, $2, 'PENDING') RETURNING *",
-      [storeId, amount]
-    );
-
-    res.status(201).json({ success: true, request: newRequest.rows[0] });
-  } catch (error) {
-    console.error('Error requesting payout:', error);
-    res.status(500).json({ error: 'Server error processing request' });
-  }
-};
-
-// @desc    Get all payouts (Admin only)
-// @route   GET /api/payouts/admin
-const getAdminPayouts = async (req, res) => {
-  try {
-    const result = await db.query(`
-      SELECT p.*, s.name as store_name, u.email as owner_email
-      FROM payout_requests p
-      JOIN stores s ON p.store_id = s.id
-      JOIN users u ON s.owner_user_id = u.id
-      ORDER BY p.requested_at DESC
-    `);
-    res.json({ success: true, payouts: result.rows });
-  } catch (error) {
-    console.error('Error fetching admin payouts:', error);
     res.status(500).json({ error: 'Server error' });
   }
 };
 
-// @desc    Update payout status (Admin only)
-// @route   PATCH /api/payouts/admin/:id
-const updatePayoutStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status, admin_notes } = req.body;
-
-    if (!['PAID', 'REJECTED'].includes(status)) {
-      return res.status(400).json({ error: 'Invalid status' });
-    }
-
-    const paid_at = status === 'PAID' ? new Date() : null;
-
-    const result = await db.query(
-      "UPDATE payout_requests SET status = $1, admin_notes = $2, paid_at = $3 WHERE id = $4 RETURNING *",
-      [status, admin_notes || null, paid_at, id]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Payout request not found' });
-    }
-
-    res.json({ success: true, request: result.rows[0] });
-  } catch (error) {
-    console.error('Error updating payout:', error);
-    res.status(500).json({ error: 'Server error updating status' });
-  }
-};
-
 module.exports = {
-  getVendorWallet,
+  getWallet,
   requestPayout,
-  getAdminPayouts,
+  getPayouts,
   updatePayoutStatus
 };

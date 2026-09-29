@@ -153,7 +153,7 @@ const CustomerOrders = () => {
                     </div>
                     <div>
                       <p className="text-xs font-medium text-gray-500 uppercase">Total Amount</p>
-                      <p className="mt-1 text-sm font-medium text-gray-900">${parseFloat(order.total_amount).toFixed(2)}</p>
+                      <p className="mt-1 text-sm font-medium text-gray-900">₹{parseFloat(order.total_amount).toFixed(2)}</p>
                     </div>
                     <div>
                       <p className="text-xs font-medium text-gray-500 uppercase">Store</p>

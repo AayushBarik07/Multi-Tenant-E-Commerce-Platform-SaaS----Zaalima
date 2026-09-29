@@ -235,7 +235,7 @@ const Checkout = () => {
                           <h3 className="text-sm font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">{item.product.name}</h3>
                           {item.variant && <p className="mt-1 text-xs text-gray-500 font-medium">Variant: {item.variant.name}</p>}
                         </div>
-                        <p className="text-base font-bold text-gray-900 ml-4">${(price * item.quantity).toFixed(2)}</p>
+                        <p className="text-base font-bold text-gray-900 ml-4">₹{(price * item.quantity).toFixed(2)}</p>
                       </li>
                     )
                   })}
@@ -244,7 +244,7 @@ const Checkout = () => {
               <div className="px-6 py-6 bg-gray-50 border-t border-gray-100">
                 <div className="flex justify-between text-base font-medium text-gray-500 mb-2">
                   <p>Subtotal</p>
-                  <p>${subtotal.toFixed(2)}</p>
+                  <p>₹{subtotal.toFixed(2)}</p>
                 </div>
                 <div className="flex justify-between text-base font-medium text-gray-500 mb-4">
                   <p>Shipping</p>
@@ -252,7 +252,7 @@ const Checkout = () => {
                 </div>
                 <div className="flex justify-between items-center text-xl font-extrabold text-gray-900 border-t border-gray-200 pt-4">
                   <p>Total Due</p>
-                  <p className="text-indigo-600">${subtotal.toFixed(2)}</p>
+                  <p className="text-indigo-600">₹{subtotal.toFixed(2)}</p>
                 </div>
               </div>
             </div>
