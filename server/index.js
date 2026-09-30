@@ -1,4 +1,4 @@
-require('dotenv').config();
+// Main Server Entry Point\nrequire('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { clerkMiddleware } = require('@clerk/express');
