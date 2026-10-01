@@ -23,7 +23,8 @@ const ProductForm = () => {
     stock: '',
     status: 'ACTIVE',
     image_url: '',
-    brand_id: ''
+    brand_id: '',
+    category: ''
   });
 
   useEffect(() => {
@@ -67,7 +68,8 @@ const ProductForm = () => {
               stock: prodData.product.stock,
               status: prodData.product.status,
               image_url: prodData.product.image_url || '',
-              brand_id: prodData.product.brand_id || ''
+              brand_id: prodData.product.brand_id || '',
+              category: prodData.product.category || ''
             });
             setVariants(prodData.product.variants || []);
           } else {
@@ -247,7 +249,7 @@ const ProductForm = () => {
             />
           </div>
           
-          <div className="md:col-span-2">
+          <div className="md:col-span-1">
             <label className="block text-sm font-medium text-gray-700">Brand Collection</label>
             <select 
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border p-2 bg-white"
@@ -258,6 +260,25 @@ const ProductForm = () => {
               {brands.map(brand => (
                 <option key={brand.id} value={brand.id}>{brand.name}</option>
               ))}
+            </select>
+          </div>
+
+          <div className="md:col-span-1">
+            <label className="block text-sm font-medium text-gray-700">Category *</label>
+            <select 
+              required
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border p-2 bg-white"
+              value={formData.category}
+              onChange={e => setFormData({...formData, category: e.target.value})}
+            >
+              <option value="" disabled>-- Select Category --</option>
+              <option value="DRESSES">Dresses</option>
+              <option value="ACCESSORIES">Accessories</option>
+              <option value="GADGETS">Gadgets</option>
+              <option value="WATCHES">Watches</option>
+              <option value="FOOTWEARS">Footwears</option>
+              <option value="BEAUTY">Beauty</option>
+              <option value="DECOR">Decor</option>
             </select>
           </div>
 

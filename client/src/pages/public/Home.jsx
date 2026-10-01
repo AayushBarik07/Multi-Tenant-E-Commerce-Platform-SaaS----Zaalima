@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import ProductCard from '../../components/ProductCard';
 
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchParams] = useSearchParams();
+  const categoryQuery = searchParams.get('category');
+  const searchQuery = searchParams.get('search');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -24,7 +27,34 @@ const Home = () => {
   }, []);
 
   // Centralized Products Array
-  const allProducts = products;
+    // Scroll to products when filter changes
+  useEffect(() => {
+    if (categoryQuery || searchQuery) {
+      setTimeout(() => {
+        document.getElementById('all-products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+  }, [categoryQuery, searchQuery]);
+
+  let allProducts = products;
+  
+  if (categoryQuery) {
+    allProducts = allProducts.filter(p => {
+      const cat = p.category ? p.category.toLowerCase() : '';
+      const name = p.name ? p.name.toLowerCase() : '';
+      const target = categoryQuery.toLowerCase();
+      return cat === target || cat.includes(target) || name.includes(target);
+    });
+  }
+  
+  if (searchQuery) {
+    allProducts = allProducts.filter(p => {
+      const name = p.name ? p.name.toLowerCase() : '';
+      const desc = p.description ? p.description.toLowerCase() : '';
+      const target = searchQuery.toLowerCase();
+      return name.includes(target) || desc.includes(target);
+    });
+  }
 
   return (
     <div className="w-full bg-white">
@@ -115,7 +145,13 @@ const Home = () => {
       <div id="all-products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex justify-between items-end mb-10 border-b border-gray-100 pb-4">
           <div>
-            <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Our Products</h2>
+            {categoryQuery || searchQuery ? (
+              <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                {searchQuery ? `Search Results for "${searchQuery}"` : `${categoryQuery} Collection`}
+              </h2>
+            ) : (
+              <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Our Products</h2>
+            )}
             <p className="mt-2 text-sm text-gray-500">Shop all available items from our verified vendors.</p>
           </div>
         </div>
