@@ -71,7 +71,7 @@ const getProductById = async (req, res) => {
 // @desc    Create a new product
 // @route   POST /api/products
 const createProduct = async (req, res) => {
-  const { store_id, brand_id, name, description, price, stock, image_url, category } = req.body || {};
+  const { store_id, brand_id, name, description, price, stock, image_url, category, subcategory } = req.body || {};
   const { userId } = getAuth(req);
 
   if (!store_id || !name || price === undefined) {
@@ -85,8 +85,8 @@ const createProduct = async (req, res) => {
     }
 
     const result = await db.query(
-      'INSERT INTO products (store_id, brand_id, name, description, price, stock, image_url, category) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-      [store_id, brand_id || null, name, description || '', price, stock || 0, image_url || '', category || null]
+      'INSERT INTO products (store_id, brand_id, name, description, price, stock, image_url, category, subcategory) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+      [store_id, brand_id || null, name, description || '', price, stock || 0, image_url || '', category || null, subcategory || null]
     );
 
     res.status(201).json({ success: true, product: result.rows[0] });
@@ -100,7 +100,7 @@ const createProduct = async (req, res) => {
 // @route   PATCH /api/products/:id
 const updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { brand_id, name, description, price, stock, image_url, status, category } = req.body || {};
+  const { brand_id, name, description, price, stock, image_url, status, category, subcategory } = req.body || {};
   const { userId } = getAuth(req);
 
   try {
@@ -121,7 +121,7 @@ const updateProduct = async (req, res) => {
     const current = productResult.rows[0];
     
     const result = await db.query(
-      'UPDATE products SET brand_id = $1, name = $2, description = $3, price = $4, stock = $5, image_url = $6, status = $7, category = $8, updated_at = CURRENT_TIMESTAMP WHERE id = $9 RETURNING *',
+      'UPDATE products SET brand_id = $1, name = $2, description = $3, price = $4, stock = $5, image_url = $6, status = $7, category = $8, subcategory = $9, updated_at = CURRENT_TIMESTAMP WHERE id = $10 RETURNING *',
       [
         brand_id !== undefined ? brand_id : current.brand_id,
         name || current.name,
