@@ -2,6 +2,128 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@clerk/clerk-react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 
+const SUBCATEGORIES = {
+  "DRESSES": [
+    "T-Shirts",
+    "Shirts",
+    "Hoodies",
+    "Sweatshirts",
+    "Jeans",
+    "Trousers",
+    "Shorts",
+    "Jackets",
+    "Co-ord Sets",
+    "Kurtas",
+    "Sarees",
+    "Dresses & Gowns",
+    "Skirts",
+    "Tops",
+    "Ethnic Wear"
+  ],
+  "ACCESSORIES": [
+    "Handbags",
+    "Backpacks",
+    "Wallets",
+    "Belts",
+    "Sunglasses",
+    "Caps & Hats",
+    "Scarves",
+    "Gloves",
+    "Jewelry",
+    "Earrings",
+    "Necklaces",
+    "Bracelets",
+    "Rings",
+    "Hair Accessories",
+    "Keychains"
+  ],
+  "GADGETS": [
+    "Smartphones",
+    "Laptops",
+    "Tablets",
+    "Headphones",
+    "Earbuds",
+    "Bluetooth Speakers",
+    "Power Banks",
+    "Chargers & Adapters",
+    "USB Cables",
+    "Computer Accessories",
+    "Gaming Accessories",
+    "Smart Home Devices",
+    "Cameras",
+    "Drones",
+    "Portable Projectors"
+  ],
+  "WATCHES": [
+    "Analog Watches",
+    "Digital Watches",
+    "Smartwatches",
+    "Chronograph Watches",
+    "Sports Watches",
+    "Luxury Watches",
+    "Casual Watches",
+    "Dress Watches",
+    "Automatic Watches",
+    "Mechanical Watches",
+    "Quartz Watches",
+    "Fitness Watches",
+    "Kids' Watches",
+    "Couple Watches",
+    "Hybrid Smartwatches"
+  ],
+  "FOOTWEARS": [
+    "Sneakers",
+    "Running Shoes",
+    "Walking Shoes",
+    "Training Shoes",
+    "Sports Shoes",
+    "Casual Shoes",
+    "Formal Shoes",
+    "Boots",
+    "Sandals",
+    "Slippers",
+    "Loafers",
+    "Flip-Flops",
+    "Heels",
+    "Flats",
+    "Ethnic Footwear"
+  ],
+  "BEAUTY": [
+    "Face Makeup",
+    "Lipsticks",
+    "Foundation",
+    "Concealer",
+    "Blush",
+    "Eye Makeup",
+    "Mascara",
+    "Eyeliner",
+    "Skincare",
+    "Face Wash",
+    "Moisturizers",
+    "Sunscreen",
+    "Perfumes",
+    "Hair Care",
+    "Beauty Tools"
+  ],
+  "DECOR": [
+    "Wall Art",
+    "Paintings",
+    "Photo Frames",
+    "Mirrors",
+    "Lamps & Lighting",
+    "Candles",
+    "Vases",
+    "Artificial Plants",
+    "Clocks",
+    "Cushions",
+    "Rugs & Carpets",
+    "Curtains",
+    "Decorative Trays",
+    "Figurines & Statues",
+    "Home Accessories"
+  ]
+};
+
 const ProductForm = () => {
   const { getToken } = useAuth();
   const navigate = useNavigate();
@@ -24,7 +146,8 @@ const ProductForm = () => {
     status: 'ACTIVE',
     image_url: '',
     brand_id: '',
-    category: ''
+    category: '',
+      subcategory: ''
   });
 
   useEffect(() => {
@@ -69,7 +192,8 @@ const ProductForm = () => {
               status: prodData.product.status,
               image_url: prodData.product.image_url || '',
               brand_id: prodData.product.brand_id || '',
-              category: prodData.product.category || ''
+              category: prodData.product.category || '',
+                subcategory: prodData.product.subcategory || ''
             });
             setVariants(prodData.product.variants || []);
           } else {
@@ -269,7 +393,7 @@ const ProductForm = () => {
               required
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border p-2 bg-white"
               value={formData.category}
-              onChange={e => setFormData({...formData, category: e.target.value})}
+              onChange={e => setFormData({...formData, category: e.target.value, subcategory: ''})}
             >
               <option value="" disabled>-- Select Category --</option>
               <option value="DRESSES">Dresses</option>
@@ -281,6 +405,22 @@ const ProductForm = () => {
               <option value="DECOR">Decor</option>
             </select>
           </div>
+          {formData.category && (
+            <div className="md:col-span-1">
+              <label className="block text-sm font-medium text-gray-700">Subcategory *</label>
+              <select 
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 border p-2 bg-white"
+                value={formData.subcategory || ''}
+                onChange={e => setFormData({...formData, subcategory: e.target.value})}
+              >
+                <option value="" disabled>-- Select Subcategory --</option>
+                {SUBCATEGORIES[formData.category]?.map(sub => (
+                  <option key={sub} value={sub}>{sub}</option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700">Description</label>

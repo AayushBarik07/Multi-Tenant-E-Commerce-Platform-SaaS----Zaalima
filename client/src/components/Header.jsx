@@ -29,6 +29,128 @@ const Header = () => {
     }
   };
 
+  const SUBCATEGORIES = {
+  "DRESSES": [
+    "T-Shirts",
+    "Shirts",
+    "Hoodies",
+    "Sweatshirts",
+    "Jeans",
+    "Trousers",
+    "Shorts",
+    "Jackets",
+    "Co-ord Sets",
+    "Kurtas",
+    "Sarees",
+    "Dresses & Gowns",
+    "Skirts",
+    "Tops",
+    "Ethnic Wear"
+  ],
+  "ACCESSORIES": [
+    "Handbags",
+    "Backpacks",
+    "Wallets",
+    "Belts",
+    "Sunglasses",
+    "Caps & Hats",
+    "Scarves",
+    "Gloves",
+    "Jewelry",
+    "Earrings",
+    "Necklaces",
+    "Bracelets",
+    "Rings",
+    "Hair Accessories",
+    "Keychains"
+  ],
+  "GADGETS": [
+    "Smartphones",
+    "Laptops",
+    "Tablets",
+    "Headphones",
+    "Earbuds",
+    "Bluetooth Speakers",
+    "Power Banks",
+    "Chargers & Adapters",
+    "USB Cables",
+    "Computer Accessories",
+    "Gaming Accessories",
+    "Smart Home Devices",
+    "Cameras",
+    "Drones",
+    "Portable Projectors"
+  ],
+  "WATCHES": [
+    "Analog Watches",
+    "Digital Watches",
+    "Smartwatches",
+    "Chronograph Watches",
+    "Sports Watches",
+    "Luxury Watches",
+    "Casual Watches",
+    "Dress Watches",
+    "Automatic Watches",
+    "Mechanical Watches",
+    "Quartz Watches",
+    "Fitness Watches",
+    "Kids' Watches",
+    "Couple Watches",
+    "Hybrid Smartwatches"
+  ],
+  "FOOTWEARS": [
+    "Sneakers",
+    "Running Shoes",
+    "Walking Shoes",
+    "Training Shoes",
+    "Sports Shoes",
+    "Casual Shoes",
+    "Formal Shoes",
+    "Boots",
+    "Sandals",
+    "Slippers",
+    "Loafers",
+    "Flip-Flops",
+    "Heels",
+    "Flats",
+    "Ethnic Footwear"
+  ],
+  "BEAUTY": [
+    "Face Makeup",
+    "Lipsticks",
+    "Foundation",
+    "Concealer",
+    "Blush",
+    "Eye Makeup",
+    "Mascara",
+    "Eyeliner",
+    "Skincare",
+    "Face Wash",
+    "Moisturizers",
+    "Sunscreen",
+    "Perfumes",
+    "Hair Care",
+    "Beauty Tools"
+  ],
+  "DECOR": [
+    "Wall Art",
+    "Paintings",
+    "Photo Frames",
+    "Mirrors",
+    "Lamps & Lighting",
+    "Candles",
+    "Vases",
+    "Artificial Plants",
+    "Clocks",
+    "Cushions",
+    "Rugs & Carpets",
+    "Curtains",
+    "Decorative Trays",
+    "Figurines & Statues",
+    "Home Accessories"
+  ]
+};
+
   const categories = ['DRESSES', 'ACCESSORIES', 'GADGETS', 'WATCHES', 'FOOTWEARS', 'BEAUTY', 'DECOR'];
 
   return (
@@ -43,18 +165,34 @@ const Header = () => {
         {/* 2. Center Categories Navigation */}
         <nav className="hidden lg:flex items-center space-x-8 font-bold text-[13px] tracking-wide text-[#282C3F] h-full flex-shrink-0">
           {categories.map(cat => (
-            <Link 
-              key={cat} 
-              to={`/?category=${cat}`} 
-              className="cursor-pointer hover:text-[#FF5A24] border-b-4 border-transparent hover:border-[#FF5A24] flex items-center h-full relative transition-colors"
-            >
-              {cat}
-              {cat === 'STUDIO' && (
-                <span className="absolute top-[20px] -right-[22px] text-[9px] font-extrabold text-[#FF3F6C]">
-                  NEW
-                </span>
+            <div key={cat} className="group h-full flex items-center relative">
+              <Link 
+                to={`/?category=${cat}`} 
+                className="cursor-pointer hover:text-[#FF5A24] border-b-4 border-transparent group-hover:border-[#FF5A24] flex items-center h-full relative transition-colors"
+              >
+                {cat}
+                {cat === 'STUDIO' && (
+                  <span className="absolute top-[20px] -right-[22px] text-[9px] font-extrabold text-[#FF3F6C]">
+                    NEW
+                  </span>
+                )}
+              </Link>
+              
+              {/* Dropdown Menu */}
+              {SUBCATEGORIES[cat] && (
+                <div className="absolute top-[80px] left-0 bg-white shadow-lg border border-gray-100 p-6 rounded-b-md hidden group-hover:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-3 min-w-[500px] z-[60]">
+                  {SUBCATEGORIES[cat].map(sub => (
+                    <Link 
+                      key={sub} 
+                      to={`/?subcategory=${encodeURIComponent(sub)}`} 
+                      className="text-sm font-medium text-gray-600 hover:text-[#FF5A24] hover:font-bold transition-colors whitespace-nowrap"
+                    >
+                      {sub}
+                    </Link>
+                  ))}
+                </div>
               )}
-            </Link>
+            </div>
           ))}
         </nav>
 

@@ -7,6 +7,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const categoryQuery = searchParams.get('category');
+  const subcategoryQuery = searchParams.get('subcategory');
   const searchQuery = searchParams.get('search');
 
   useEffect(() => {
@@ -29,12 +30,12 @@ const Home = () => {
   // Centralized Products Array
     // Scroll to products when filter changes
   useEffect(() => {
-    if (categoryQuery || searchQuery) {
+    if (categoryQuery || searchQuery || subcategoryQuery) {
       setTimeout(() => {
         document.getElementById('all-products')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 100);
     }
-  }, [categoryQuery, searchQuery]);
+  }, [categoryQuery, searchQuery, subcategoryQuery]);
 
   let allProducts = products;
   
@@ -44,6 +45,14 @@ const Home = () => {
       const name = p.name ? p.name.toLowerCase() : '';
       const target = categoryQuery.toLowerCase();
       return cat === target || cat.includes(target) || name.includes(target);
+    });
+  }
+
+  if (subcategoryQuery) {
+    allProducts = allProducts.filter(p => {
+      const subcat = p.subcategory ? p.subcategory.toLowerCase() : '';
+      const target = subcategoryQuery.toLowerCase();
+      return subcat === target || subcat.includes(target);
     });
   }
   
@@ -145,9 +154,9 @@ const Home = () => {
       <div id="all-products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="flex justify-between items-end mb-10 border-b border-gray-100 pb-4">
           <div>
-            {categoryQuery || searchQuery ? (
+            {categoryQuery || searchQuery || subcategoryQuery ? (
               <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-                {searchQuery ? `Search Results for "${searchQuery}"` : `${categoryQuery} Collection`}
+                {searchQuery ? `Search Results for "${searchQuery}"` : subcategoryQuery ? `${subcategoryQuery} Collection` : `${categoryQuery} Collection`}
               </h2>
             ) : (
               <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Our Products</h2>
