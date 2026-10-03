@@ -16,7 +16,7 @@ import Success from './pages/public/Success';
 import CustomerOrders from './pages/customer/CustomerOrders';
 import Wishlist from './pages/customer/Wishlist';
 import BecomeVendor from './pages/public/BecomeVendor';
-import CartDrawer from './components/public/CartDrawer';
+import CartPage from './pages/public/CartPage';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import { toggleCart } from './redux/slices/cartSlice';
@@ -118,7 +118,7 @@ function App() {
         <div className="min-h-screen bg-gray-50 flex flex-col">
           <Header />
 
-          <CartDrawer />
+          
 
           {/* Main Content */}
           <main className="flex-grow p-4 flex justify-center items-start">
