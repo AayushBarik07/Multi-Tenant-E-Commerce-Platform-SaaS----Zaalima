@@ -129,6 +129,7 @@ function App() {
               <Route path="/become-vendor" element={<BecomeVendor />} />
                 <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/success/:transactionId" element={<Success />} />
+                <Route path="/cart" element={<CartPage />} />
                 <Route path="/checkout" element={
                 <SignedIn>
                   <Checkout />
