@@ -184,10 +184,24 @@ const Checkout = () => {
     appearance,
   };
 
+  const getItemPrice = (item) => {
+    if (item.variant) {
+      if (item.variant.price !== undefined && item.variant.price !== null) {
+        return parseFloat(item.variant.price);
+      }
+      if (item.variant.price_adjustment !== undefined && item.variant.price_adjustment !== null) {
+        return parseFloat(item.product.price) + parseFloat(item.variant.price_adjustment);
+      }
+    }
+    return parseFloat(item.product.price);
+  };
+
   const subtotal = items.reduce((total, item) => {
-    const itemPrice = item.variant ? parseFloat(item.variant.price) : parseFloat(item.product.price);
-    return total + (itemPrice * item.quantity);
+    return total + (getItemPrice(item) * item.quantity);
   }, 0);
+
+  const deliveryFee = items.length > 0 ? 50 : 0;
+  const totalDue = subtotal + deliveryFee;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -216,7 +230,7 @@ const Checkout = () => {
               <div className="px-6 py-6 max-h-[60vh] overflow-y-auto">
                 <ul className="divide-y divide-gray-100">
                   {items.map((item) => {
-                    const price = item.variant ? parseFloat(item.variant.price) : parseFloat(item.product.price);
+                    const price = getItemPrice(item);
                     return (
                       <li key={item.cartItemId} className="py-5 flex items-center group">
                         <div className="relative shrink-0 overflow-hidden rounded-xl bg-gray-100 w-20 h-20">
@@ -247,12 +261,12 @@ const Checkout = () => {
                   <p>₹{subtotal.toFixed(2)}</p>
                 </div>
                 <div className="flex justify-between text-base font-medium text-gray-500 mb-4">
-                  <p>Shipping</p>
-                  <p>Free</p>
+                  <p>Delivery fee</p>
+                  <p>₹{deliveryFee.toFixed(2)}</p>
                 </div>
                 <div className="flex justify-between items-center text-xl font-extrabold text-gray-900 border-t border-gray-200 pt-4">
                   <p>Total Due</p>
-                  <p className="text-indigo-600">₹{subtotal.toFixed(2)}</p>
+                  <p className="text-indigo-600">₹{totalDue.toFixed(2)}</p>
                 </div>
               </div>
             </div>

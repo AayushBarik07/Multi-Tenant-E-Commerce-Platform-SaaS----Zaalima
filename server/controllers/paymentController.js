@@ -15,14 +15,26 @@ const createPaymentIntent = async (req, res) => {
   try {
     let totalAmount = 0;
     
-    // In a real production app, ALWAYS verify prices against the database 
-    // to prevent malicious frontend price tampering!
+    const getItemPrice = (item) => {
+      const { product, variant } = item;
+      if (variant) {
+        if (variant.price !== undefined && variant.price !== null) {
+          return parseFloat(variant.price);
+        }
+        if (variant.price_adjustment !== undefined && variant.price_adjustment !== null) {
+          return parseFloat(product.price) + parseFloat(variant.price_adjustment);
+        }
+      }
+      return parseFloat(product.price);
+    };
+
     for (const item of items) {
-      const { product, variant, quantity } = item;
-      
-      const price = parseFloat(product.price) + (variant ? parseFloat(variant.price_adjustment) : 0);
-      totalAmount += price * quantity;
+      const price = getItemPrice(item);
+      totalAmount += price * item.quantity;
     }
+
+    const deliveryFee = items.length > 0 ? 50 : 0;
+    totalAmount += deliveryFee;
 
     // Stripe expects amount in cents
     const amountInCents = Math.round(totalAmount * 100);
@@ -55,8 +67,8 @@ const createPaymentIntent = async (req, res) => {
 
     // Insert order items
     for (const item of items) {
-      const { product, variant, quantity } = item;
-      const price = parseFloat(product.price) + (variant ? parseFloat(variant.price_adjustment) : 0);
+      const { product, quantity } = item;
+      const price = getItemPrice(item);
       const subtotal = price * quantity;
       
       await db.query(

@@ -10,9 +10,20 @@ const CartPage = () => {
 
   const [discountCode, setDiscountCode] = useState('');
   
+  const getItemPrice = (item) => {
+    if (item.variant) {
+      if (item.variant.price !== undefined && item.variant.price !== null) {
+        return parseFloat(item.variant.price);
+      }
+      if (item.variant.price_adjustment !== undefined && item.variant.price_adjustment !== null) {
+        return parseFloat(item.product.price) + parseFloat(item.variant.price_adjustment);
+      }
+    }
+    return parseFloat(item.product.price);
+  };
+
   const subtotal = items.reduce((total, item) => {
-    const itemPrice = item.variant ? parseFloat(item.variant.price_adjustment || 0) + parseFloat(item.product.price) : parseFloat(item.product.price);
-    return total + (itemPrice * item.quantity);
+    return total + (getItemPrice(item) * item.quantity);
   }, 0);
 
   // Placeholder logic for layout completeness
@@ -48,7 +59,7 @@ const CartPage = () => {
               {/* Items */}
               <ul className="divide-y divide-gray-100">
                 {items.map((item) => {
-                  const price = parseFloat(item.product.price) + (item.variant ? parseFloat(item.variant.price_adjustment || 0) : 0);
+                  const price = getItemPrice(item);
                   const maxStock = item.variant ? item.variant.stock : item.product.stock;
 
                   return (
