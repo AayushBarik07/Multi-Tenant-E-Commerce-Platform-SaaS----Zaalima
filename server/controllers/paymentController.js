@@ -5,7 +5,7 @@ const db = require('../utils/db');
 // @desc    Create a Stripe Payment Intent for checkout
 // @route   POST /api/payments/create-intent
 const createPaymentIntent = async (req, res) => {
-  const { items } = req.body;
+  const { items, couponCode } = req.body;
   const { userId } = getAuth(req); // Usually require auth for checkout
 
   if (!items || items.length === 0) {
@@ -13,8 +13,6 @@ const createPaymentIntent = async (req, res) => {
   }
 
   try {
-    let totalAmount = 0;
-    
     const getItemPrice = (item) => {
       const { product, variant } = item;
       if (variant) {
@@ -28,13 +26,24 @@ const createPaymentIntent = async (req, res) => {
       return parseFloat(product.price);
     };
 
+    let subtotal = 0;
     for (const item of items) {
       const price = getItemPrice(item);
-      totalAmount += price * item.quantity;
+      subtotal += price * item.quantity;
+    }
+
+    let discount = 0;
+    if (couponCode) {
+      const code = String(couponCode).trim().toUpperCase();
+      if (code === 'ZAALIMA10' || code === 'WELCOME10') {
+        discount = (subtotal * 10) / 100;
+      } else if (code === 'FLAT50') {
+        discount = Math.min(50, subtotal);
+      }
     }
 
     const deliveryFee = items.length > 0 ? 50 : 0;
-    totalAmount += deliveryFee;
+    const totalAmount = Math.max(0, subtotal - discount + deliveryFee);
 
     // Stripe expects amount in cents
     const amountInCents = Math.round(totalAmount * 100);

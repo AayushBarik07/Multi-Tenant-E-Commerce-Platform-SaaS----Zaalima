@@ -137,3 +137,7 @@ This project was meticulously built over 4 weeks, transitioning from concept to 
 * **Day 26:** Automated `.xlsx` Excel Report Generation for offline bookkeeping (Admin & Vendor).
 * **Day 27:** Migrated platform currency to INR (₹) and finalized CI/CD build configurations.
 * **Day 28:** Final Polish & Live Deployment to Vercel (Frontend) and Render (Backend).
+
+**Week 5: Mega-Menu Taxonomy, Full-Page Cart & Checkout Optimization**
+* **Day 29:** Designed interactive Myntra-style hover Mega-Menus with 105 granular subcategories across 7 primary categories (`DRESSES`, `ACCESSORIES`, `GADGETS`, `WATCHES`, `FOOTWEARS`, `BEAUTY`, `DECOR`). Implemented dynamic two-tier subcategory selectors in the Vendor product portal with PostgreSQL database migrations.
+* **Day 30:** Re-architected Shopping Cart into a dedicated full-page checkout funnel (`/cart`) with automated `localStorage` persistence in Redux. Unified delivery fee calculations (₹50.00) and implemented dynamic voucher discount codes (`ZAALIMA10`, `FLAT50`) across Cart, Checkout Order Summary, and Stripe backend payment processing.

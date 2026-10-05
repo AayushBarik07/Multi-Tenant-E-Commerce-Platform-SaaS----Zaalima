@@ -92,7 +92,7 @@ const CheckoutForm = ({ clientSecret }) => {
 
 const Checkout = () => {
   const [clientSecret, setClientSecret] = useState("");
-  const { items } = useSelector(state => state.cart);
+  const { items, coupon } = useSelector(state => state.cart);
   const dbUser = useSelector(state => state.auth.user);
   const { getToken } = useAuth();
   
@@ -110,7 +110,7 @@ const Checkout = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}` 
           },
-          body: JSON.stringify({ items }),
+          body: JSON.stringify({ items, couponCode: coupon?.code }),
         });
         const data = await res.json();
         
@@ -125,7 +125,7 @@ const Checkout = () => {
     };
 
     createPaymentIntent();
-  }, [items, getToken]);
+  }, [items, coupon, getToken]);
 
   if (isAdmin) {
     return (
@@ -200,8 +200,14 @@ const Checkout = () => {
     return total + (getItemPrice(item) * item.quantity);
   }, 0);
 
+  const discount = coupon
+    ? coupon.discountPercent
+      ? (subtotal * coupon.discountPercent) / 100
+      : (coupon.discountFlat || 0)
+    : 0;
+
   const deliveryFee = items.length > 0 ? 50 : 0;
-  const totalDue = subtotal + deliveryFee;
+  const totalDue = Math.max(0, subtotal - discount + deliveryFee);
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -260,6 +266,12 @@ const Checkout = () => {
                   <p>Subtotal</p>
                   <p>₹{subtotal.toFixed(2)}</p>
                 </div>
+                {discount > 0 && (
+                  <div className="flex justify-between text-base font-medium text-green-600 mb-2 font-semibold">
+                    <p>Discount ({coupon?.code})</p>
+                    <p>-₹{discount.toFixed(2)}</p>
+                  </div>
+                )}
                 <div className="flex justify-between text-base font-medium text-gray-500 mb-4">
                   <p>Delivery fee</p>
                   <p>₹{deliveryFee.toFixed(2)}</p>

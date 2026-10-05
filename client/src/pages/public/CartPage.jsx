@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { removeFromCart, updateQuantity } from '../../redux/slices/cartSlice';
+import { removeFromCart, updateQuantity, applyCoupon, removeCoupon } from '../../redux/slices/cartSlice';
 
 const CartPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { items } = useSelector((state) => state.cart);
+  const { items, coupon } = useSelector((state) => state.cart);
 
   const [discountCode, setDiscountCode] = useState('');
+  const [couponError, setCouponError] = useState('');
   
   const getItemPrice = (item) => {
     if (item.variant) {
@@ -26,10 +27,35 @@ const CartPage = () => {
     return total + (getItemPrice(item) * item.quantity);
   }, 0);
 
-  // Placeholder logic for layout completeness
-  const discount = 0; // e.g. 0.1 * subtotal if valid discount
+  const discount = coupon
+    ? coupon.discountPercent
+      ? (subtotal * coupon.discountPercent) / 100
+      : (coupon.discountFlat || 0)
+    : 0;
+
   const deliveryFee = items.length > 0 ? 50 : 0;
-  const total = subtotal - discount + deliveryFee;
+  const total = Math.max(0, subtotal - discount + deliveryFee);
+
+  const handleApplyCoupon = (e) => {
+    e.preventDefault();
+    setCouponError('');
+    const code = discountCode.trim().toUpperCase();
+
+    if (!code) {
+      setCouponError('Please enter a voucher code');
+      return;
+    }
+
+    if (code === 'ZAALIMA10' || code === 'WELCOME10') {
+      dispatch(applyCoupon({ code, discountPercent: 10 }));
+      setDiscountCode('');
+    } else if (code === 'FLAT50') {
+      dispatch(applyCoupon({ code, discountFlat: 50 }));
+      setDiscountCode('');
+    } else {
+      setCouponError('Invalid voucher code. Try ZAALIMA10 or FLAT50');
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
@@ -143,19 +169,47 @@ const CartPage = () => {
             <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sticky top-24">
               <h2 className="text-lg font-bold text-gray-900 mb-6">Order Summary</h2>
               
-              {/* Discount Input */}
-              <div className="flex gap-2 mb-6">
-                <input 
-                  type="text" 
-                  placeholder="Discount voucher" 
-                  className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
-                  value={discountCode}
-                  onChange={(e) => setDiscountCode(e.target.value)}
-                />
-                <button className="px-6 py-2 border border-gray-300 rounded-full text-sm font-semibold hover:bg-gray-50 transition-colors">
-                  Apply
-                </button>
-              </div>
+              {/* Discount Input or Applied Badge */}
+              {coupon ? (
+                <div className="mb-6 p-3 bg-green-50 border border-green-200 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-green-600 font-bold text-sm">🎉 {coupon.code} Applied</span>
+                    <span className="text-xs text-green-700 font-medium">
+                      ({coupon.discountPercent ? `${coupon.discountPercent}% Off` : `₹${coupon.discountFlat} Off`})
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => dispatch(removeCoupon())}
+                    className="text-xs text-red-500 hover:text-red-700 font-semibold underline cursor-pointer"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleApplyCoupon} className="mb-6">
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      placeholder="Discount voucher (e.g. ZAALIMA10)" 
+                      className="flex-1 border border-gray-300 rounded-full px-4 py-2 text-sm uppercase placeholder:normal-case focus:outline-none focus:border-black focus:ring-1 focus:ring-black"
+                      value={discountCode}
+                      onChange={(e) => {
+                        setDiscountCode(e.target.value);
+                        if (couponError) setCouponError('');
+                      }}
+                    />
+                    <button 
+                      type="submit" 
+                      className="px-6 py-2 border border-gray-300 rounded-full text-sm font-semibold hover:bg-gray-50 transition-colors cursor-pointer"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                  {couponError && (
+                    <p className="text-xs text-red-500 mt-2 px-2 font-medium">{couponError}</p>
+                  )}
+                </form>
+              )}
 
               {/* Price Breakdown */}
               <div className="space-y-3 text-sm text-gray-600 mb-6">
@@ -164,9 +218,9 @@ const CartPage = () => {
                   <span className="font-medium text-gray-900">₹{subtotal.toFixed(2)}</span>
                 </div>
                 {discount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>Discount</span>
-                    <span className="font-medium">-₹{discount.toFixed(2)}</span>
+                  <div className="flex justify-between text-green-600 font-semibold">
+                    <span>Discount ({coupon?.code})</span>
+                    <span>-₹{discount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">

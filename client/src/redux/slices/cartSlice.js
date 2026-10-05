@@ -10,6 +10,16 @@ const loadCartFromStorage = () => {
   }
 };
 
+const loadCouponFromStorage = () => {
+  try {
+    const serialized = localStorage.getItem('ecomverse_coupon');
+    if (serialized === null) return null;
+    return JSON.parse(serialized);
+  } catch (e) {
+    return null;
+  }
+};
+
 const saveCartToStorage = (items) => {
   try {
     localStorage.setItem('ecomverse_cart', JSON.stringify(items));
@@ -18,8 +28,21 @@ const saveCartToStorage = (items) => {
   }
 };
 
+const saveCouponToStorage = (coupon) => {
+  try {
+    if (coupon) {
+      localStorage.setItem('ecomverse_coupon', JSON.stringify(coupon));
+    } else {
+      localStorage.removeItem('ecomverse_coupon');
+    }
+  } catch (e) {
+    console.error('Could not save coupon', e);
+  }
+};
+
 const initialState = {
   items: loadCartFromStorage(), // { product, variant, quantity }
+  coupon: loadCouponFromStorage(), // { code, discountPercent, discountFlat }
   isOpen: false,
 };
 
@@ -77,9 +100,19 @@ const cartSlice = createSlice({
         saveCartToStorage(state.items);
       }
     },
+    applyCoupon: (state, action) => {
+      state.coupon = action.payload;
+      saveCouponToStorage(state.coupon);
+    },
+    removeCoupon: (state) => {
+      state.coupon = null;
+      saveCouponToStorage(null);
+    },
     clearCart: (state) => {
       state.items = [];
+      state.coupon = null;
       saveCartToStorage(state.items);
+      saveCouponToStorage(null);
     }
   }
 });
@@ -91,6 +124,8 @@ export const {
   addToCart, 
   removeFromCart, 
   updateQuantity, 
+  applyCoupon,
+  removeCoupon,
   clearCart 
 } = cartSlice.actions;
 
