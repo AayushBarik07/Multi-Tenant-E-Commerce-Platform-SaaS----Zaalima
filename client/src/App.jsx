@@ -148,6 +148,16 @@ function App() {
                   </SignedOut>
                 </>
               } />
+              <Route path="/orders" element={
+                <>
+                  <SignedIn>
+                    <CustomerOrders />
+                  </SignedIn>
+                  <SignedOut>
+                    <Navigate to="/sign-in" />
+                  </SignedOut>
+                </>
+              } />
               
               {/* Protected Admin Routes */}
               <Route path="/admin" element={

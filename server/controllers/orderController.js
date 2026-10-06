@@ -21,7 +21,20 @@ const getMyOrders = async (req, res) => {
       [customerUserId]
     );
 
-    res.json({ success: true, orders: ordersResult.rows });
+    const orders = ordersResult.rows;
+
+    for (const order of orders) {
+      const itemsResult = await db.query(
+        `SELECT oi.id, oi.quantity, oi.unit_price, oi.subtotal, p.id as product_id, p.name as product_name, p.image_url, p.category, p.subcategory
+         FROM order_items oi
+         JOIN products p ON oi.product_id = p.id
+         WHERE oi.order_id = $1`,
+        [order.id]
+      );
+      order.items = itemsResult.rows;
+    }
+
+    res.json({ success: true, orders });
   } catch (error) {
     console.error('Error fetching customer orders:', error);
     res.status(500).json({ error: 'Server error fetching orders' });

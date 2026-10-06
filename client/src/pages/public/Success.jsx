@@ -60,7 +60,7 @@ const Success = () => {
         <div className="mt-6 text-center">
           <h2 className="text-3xl font-extrabold text-gray-900">Order Placed Successfully!</h2>
           <p className="mt-2 text-lg text-gray-600">
-            Thank you for shopping with EComVerse. Your payment has been securely processed.
+            Thank you for shopping with Zaalima. Your payment has been securely processed.
           </p>
         </div>
 
@@ -96,10 +96,16 @@ const Success = () => {
           </dl>
         </div>
 
-        <div className="mt-10">
+        <div className="mt-10 flex flex-col sm:flex-row gap-3">
+          <Link
+            to="/dashboard"
+            className="flex-1 flex items-center justify-center px-4 py-3 border border-transparent text-base font-semibold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition-colors cursor-pointer"
+          >
+            Track Order & Invoices
+          </Link>
           <Link
             to="/"
-            className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="flex-1 flex items-center justify-center px-4 py-3 border border-gray-300 text-base font-semibold rounded-xl text-gray-700 bg-white hover:bg-gray-50 shadow-sm transition-colors cursor-pointer"
           >
             Continue Shopping
           </Link>
