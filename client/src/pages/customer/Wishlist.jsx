@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useAuth } from '@clerk/clerk-react';
 import { fetchWishlist } from '../../redux/slices/wishlistSlice';
+import { addToCart } from '../../redux/slices/cartSlice';
 import ProductCard from '../../components/ProductCard';
 import { Link } from 'react-router-dom';
 
@@ -9,6 +10,7 @@ const Wishlist = () => {
   const dispatch = useDispatch();
   const { getToken, isLoaded, isSignedIn } = useAuth();
   const { items, status } = useSelector(state => state.wishlist);
+  const [movedAll, setMovedAll] = useState(false);
 
   useEffect(() => {
     const loadWishlist = async () => {
@@ -19,6 +21,15 @@ const Wishlist = () => {
     };
     loadWishlist();
   }, [isLoaded, isSignedIn, status, getToken, dispatch]);
+
+  const handleMoveAllToBag = () => {
+    if (items.length === 0) return;
+    items.forEach(product => {
+      dispatch(addToCart({ product, quantity: 1 }));
+    });
+    setMovedAll(true);
+    setTimeout(() => setMovedAll(false), 2500);
+  };
 
   if (!isSignedIn) {
     return (
@@ -31,13 +42,44 @@ const Wishlist = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
-      <div className="flex justify-between items-end mb-10 border-b border-gray-100 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 border-b border-gray-100 pb-6 gap-4">
         <div>
           <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">My Wishlist</h2>
           <p className="mt-2 text-sm text-gray-500">
             {items.length} {items.length === 1 ? 'item' : 'items'} saved for later
           </p>
         </div>
+        {items.length > 0 && (
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={handleMoveAllToBag}
+              disabled={movedAll}
+              className={`cursor-pointer px-5 py-2.5 rounded-full text-sm font-bold shadow-sm transition-all duration-300 flex items-center ${
+                movedAll
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-gray-900 text-white hover:bg-[#FF5A24]'
+              }`}
+            >
+              {movedAll ? (
+                <>
+                  <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path></svg>
+                  All Added to Bag!
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                  Add All to Bag ({items.length})
+                </>
+              )}
+            </button>
+            <Link
+              to="/cart"
+              className="cursor-pointer px-5 py-2.5 rounded-full text-sm font-bold border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Go to Bag &rarr;
+            </Link>
+          </div>
+        )}
       </div>
 
       {status === 'loading' ? (

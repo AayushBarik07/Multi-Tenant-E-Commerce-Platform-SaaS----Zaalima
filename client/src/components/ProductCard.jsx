@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { addToWishlist, removeFromWishlist } from '../redux/slices/wishlistSlice';
 import { useAuth } from '@clerk/clerk-react';
 import { addToCart } from '../redux/slices/cartSlice';
@@ -9,6 +9,7 @@ const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { getToken, isSignedIn } = useAuth();
+  const [isAdded, setIsAdded] = useState(false);
   const dbUser = useSelector(state => state.auth.user);
   const isStaff = dbUser && (dbUser.role === 'SUPER_ADMIN' || dbUser.role === 'VENDOR');
   const wishlistIds = useSelector(state => state.wishlist.itemIds);
@@ -32,6 +33,10 @@ const ProductCard = ({ product }) => {
       product: product,
       quantity: 1
     }));
+    setIsAdded(true);
+    setTimeout(() => {
+      setIsAdded(false);
+    }, 1500);
   };
   // Check if we need to show badges (mock logic for visual)
   const isNew = new Date(product.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -112,9 +117,22 @@ const ProductCard = ({ product }) => {
           {!isStaff && (
             <button 
               onClick={handleAddToCart}
-              className="cursor-pointer w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-white hover:bg-[#FF5A24] hover:-translate-y-1 hover:shadow-lg hover:shadow-[#FF5A24]/30 transition-all duration-300"
+              title={isAdded ? "Added to bag!" : "Add to bag"}
+              className={`cursor-pointer w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 ${
+                isAdded 
+                  ? 'bg-emerald-600 text-white scale-110 shadow-lg shadow-emerald-600/30' 
+                  : 'bg-gray-900 text-white hover:bg-[#FF5A24] hover:-translate-y-1 hover:shadow-lg hover:shadow-[#FF5A24]/30'
+              }`}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+              {isAdded ? (
+                <svg className="w-5 h-5 animate-scale-check" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7"></path>
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                </svg>
+              )}
             </button>
           )}
         </div>

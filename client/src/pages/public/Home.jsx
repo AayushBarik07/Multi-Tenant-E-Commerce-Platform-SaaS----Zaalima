@@ -5,7 +5,10 @@ import ProductCard from '../../components/ProductCard';
 const Home = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [sortBy, setSortBy] = useState('FEATURED');
+  const [priceFilter, setPriceFilter] = useState('ALL');
+
   const categoryQuery = searchParams.get('category');
   const subcategoryQuery = searchParams.get('subcategory');
   const searchQuery = searchParams.get('search');
@@ -27,8 +30,7 @@ const Home = () => {
     fetchProducts();
   }, []);
 
-  // Centralized Products Array
-    // Scroll to products when filter changes
+  // Scroll to products when filter changes
   useEffect(() => {
     if (categoryQuery || searchQuery || subcategoryQuery) {
       setTimeout(() => {
@@ -64,6 +66,30 @@ const Home = () => {
       return name.includes(target) || desc.includes(target);
     });
   }
+
+  if (priceFilter !== 'ALL') {
+    allProducts = allProducts.filter(p => {
+      const price = parseFloat(p.price);
+      if (priceFilter === 'UNDER_500') return price < 500;
+      if (priceFilter === '500_1500') return price >= 500 && price <= 1500;
+      if (priceFilter === '1500_3000') return price >= 1500 && price <= 3000;
+      if (priceFilter === 'OVER_3000') return price > 3000;
+      return true;
+    });
+  }
+
+  allProducts = [...allProducts].sort((a, b) => {
+    if (sortBy === 'PRICE_LOW_HIGH') return parseFloat(a.price) - parseFloat(b.price);
+    if (sortBy === 'PRICE_HIGH_LOW') return parseFloat(b.price) - parseFloat(a.price);
+    if (sortBy === 'NEWEST') return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+    return 0; // FEATURED
+  });
+
+  const clearAllFilters = () => {
+    setSearchParams({});
+    setPriceFilter('ALL');
+    setSortBy('FEATURED');
+  };
 
   return (
     <div className="w-full bg-white">
@@ -152,7 +178,7 @@ const Home = () => {
 
       {/* Centralized All Products Section */}
       <div id="all-products" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex justify-between items-end mb-10 border-b border-gray-100 pb-4">
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 border-b border-gray-100 pb-6 gap-4">
           <div>
             {categoryQuery || searchQuery || subcategoryQuery ? (
               <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
@@ -161,8 +187,103 @@ const Home = () => {
             ) : (
               <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">Our Products</h2>
             )}
-            <p className="mt-2 text-sm text-gray-500">Shop all available items from our verified vendors.</p>
+            <p className="mt-2 text-sm text-gray-500">
+              Showing <span className="font-bold text-gray-900">{allProducts.length}</span> {allProducts.length === 1 ? 'item' : 'items'} from our verified stores
+            </p>
           </div>
+
+          {/* Sort By Dropdown */}
+          <div className="flex items-center space-x-2 self-start md:self-end">
+            <label htmlFor="sort" className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Sort By:</label>
+            <select
+              id="sort"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="bg-gray-50 border border-gray-200 text-gray-900 text-sm font-medium rounded-xl px-3 py-2 focus:ring-1 focus:ring-black focus:border-black cursor-pointer"
+            >
+              <option value="FEATURED">Featured</option>
+              <option value="PRICE_LOW_HIGH">Price: Low to High</option>
+              <option value="PRICE_HIGH_LOW">Price: High to Low</option>
+              <option value="NEWEST">Newest First</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Price Filter Chips & Active Filter Badges */}
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-8 bg-gray-50/70 p-3 rounded-2xl border border-gray-100">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider mr-1">Price:</span>
+            {[
+              { label: 'All', value: 'ALL' },
+              { label: 'Under ₹500', value: 'UNDER_500' },
+              { label: '₹500 - ₹1.5k', value: '500_1500' },
+              { label: '₹1.5k - ₹3k', value: '1500_3000' },
+              { label: 'Over ₹3k', value: 'OVER_3000' },
+            ].map((chip) => (
+              <button
+                key={chip.value}
+                onClick={() => setPriceFilter(chip.value)}
+                className={`text-xs px-3 py-1.5 rounded-full font-semibold transition-all cursor-pointer ${
+                  priceFilter === chip.value
+                    ? 'bg-gray-900 text-white shadow-sm'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Active Filter Badges */}
+          {(categoryQuery || subcategoryQuery || searchQuery || priceFilter !== 'ALL') && (
+            <div className="flex flex-wrap items-center gap-2">
+              {categoryQuery && (
+                <span className="inline-flex items-center text-xs bg-orange-50 text-[#FF5A24] font-semibold px-2.5 py-1 rounded-full border border-orange-200">
+                  {categoryQuery}
+                  <button 
+                    onClick={() => {
+                      const next = new URLSearchParams(searchParams);
+                      next.delete('category');
+                      setSearchParams(next);
+                    }} 
+                    className="ml-1 text-orange-400 hover:text-orange-700 font-bold"
+                  >✕</button>
+                </span>
+              )}
+              {subcategoryQuery && (
+                <span className="inline-flex items-center text-xs bg-orange-50 text-[#FF5A24] font-semibold px-2.5 py-1 rounded-full border border-orange-200">
+                  {subcategoryQuery}
+                  <button 
+                    onClick={() => {
+                      const next = new URLSearchParams(searchParams);
+                      next.delete('subcategory');
+                      setSearchParams(next);
+                    }} 
+                    className="ml-1 text-orange-400 hover:text-orange-700 font-bold"
+                  >✕</button>
+                </span>
+              )}
+              {searchQuery && (
+                <span className="inline-flex items-center text-xs bg-blue-50 text-blue-700 font-semibold px-2.5 py-1 rounded-full border border-blue-200">
+                  "{searchQuery}"
+                  <button 
+                    onClick={() => {
+                      const next = new URLSearchParams(searchParams);
+                      next.delete('search');
+                      setSearchParams(next);
+                    }} 
+                    className="ml-1 text-blue-400 hover:text-blue-700 font-bold"
+                  >✕</button>
+                </span>
+              )}
+              <button
+                onClick={clearAllFilters}
+                className="text-xs text-red-600 hover:text-red-800 font-bold underline ml-1 cursor-pointer"
+              >
+                Clear All
+              </button>
+            </div>
+          )}
         </div>
         
         {loading ? (
